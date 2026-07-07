@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="d392aa67-90b0-4bb7-b9b7-d8311ebdf52e">
+  <name>Тесты_КИИ_RAG</name>
+  <comment>YAxUnit-тесты RAG native (КИИ_RAG): скаляр/нормализация/ранжирование/чанкер/контекст/фильтр модели/privacy.</comment>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>

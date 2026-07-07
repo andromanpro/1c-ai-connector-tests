@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="c51c3640-feb3-4fd6-9bb6-3492d4377b23">
+  <name>Тесты_КИИ_СерверMCPAuth</name>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>

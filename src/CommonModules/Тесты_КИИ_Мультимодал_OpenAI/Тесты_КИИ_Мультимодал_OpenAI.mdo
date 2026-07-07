@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="43268e16-422d-406b-8768-c8235e79b3dd">
+  <name>Тесты_КИИ_Мультимодал_OpenAI</name>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>

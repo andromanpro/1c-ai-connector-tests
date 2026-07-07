@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="ddde9540-797a-48ad-a9de-81410cabe690">
+  <name>Тесты_КИИ_Ядро</name>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>
