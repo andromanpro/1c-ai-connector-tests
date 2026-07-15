@@ -34,6 +34,7 @@
   <content>CommonModule.Тесты_КИИ_TelegramУведомления</content>
   <content>CommonModule.Тесты_КИИ_АнализКонфигурации</content>
   <content>CommonModule.Тесты_КИИ_ГенераторДиаграмм</content>
+  <content>CommonModule.Тесты_КИИ_АгентАнализа</content>
   <defaultLanguage>Language.Русский</defaultLanguage>
   <interfaceCompatibilityMode>TaxiEnableVersion8_2</interfaceCompatibilityMode>
   <languages uuid="c923b242-3013-4e3b-8838-fe70720b7bdb" extendedConfigurationObject="db4a9ccb-9ef5-4b3c-8577-b6fe5db1b62e">
@@ -59,4 +60,5 @@
   <commonModules>CommonModule.Тесты_КИИ_TelegramУведомления</commonModules>
   <commonModules>CommonModule.Тесты_КИИ_АнализКонфигурации</commonModules>
   <commonModules>CommonModule.Тесты_КИИ_ГенераторДиаграмм</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_АгентАнализа</commonModules>
 </mdclass:Configuration>
