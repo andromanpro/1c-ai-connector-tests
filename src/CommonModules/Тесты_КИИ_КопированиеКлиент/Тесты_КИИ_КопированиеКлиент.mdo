@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="b9399722-d84b-4082-b7ce-e55edd0525d2">
+  <name>Тесты_КИИ_КопированиеКлиент</name>
+  <synonym>
+    <key>ru</key>
+    <value>Проверки форм копирования ИИконы</value>
+  </synonym>
+  <clientManagedApplication>true</clientManagedApplication>
+</mdclass:CommonModule>
