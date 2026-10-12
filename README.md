@@ -101,6 +101,16 @@ py -3.14 tools/run-warning-form-tests.py --base-path "<отдельная баз
 `РегламентыОчистки_СоздаютсяИНеДублируются`: он создает недостающие штатные задания
 очистки кеша, аудита MCP и журнала контроля персональных данных; задания остаются.
 
+## О проекте
+
+[ИИкона](https://github.com/andromanpro/1c-ai-connector) — расширение для работы с ИИ в 1С.
+
+<a href="https://infostart.ru/1c/articles/2814180/">
+  <img src="https://infostart.ru/bitrix/templates/sandbox_empty/assets/tpl/abo/img/logo.svg" alt="Инфостарт" width="140">
+</a>
+
+[Обзор ИИконы на Инфостарте](https://infostart.ru/1c/articles/2814180/).
+
 ## Лицензия
 
 [MIT](LICENSE) © 2026 Роман Андриянов ([androman.pro](https://androman.pro))
