@@ -1,3 +1,7 @@
+> Кандидат аудита: продукт **1.7.2-audit-26**, тесты **1.7.2-audit-34**.
+> Проверены 810 выбранных серверных тестов и отдельно 35 профильных.
+> [Манифест и ограничения](verification/VERIFICATION.json), [точный JUnit 810](verification/junit-810.xml).
+
 # Тесты ИИконы
 
 Тестовое расширение YAxUnit для [ИИконы](https://github.com/andromanpro/1c-ai-connector).

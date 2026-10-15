@@ -1,2 +1,6 @@
 .settings/
 bin/
+
+__pycache__/
+
+*.pyc
