@@ -43,6 +43,55 @@ class ReceiptTest(unittest.TestCase):
         self.assertEqual(self.receipt.junit(0, True)['total'], 1)
         self.receipt.sonar_input({'product': self.xml})
 
+    def with_contexts(self, tests, contexts):
+        self.receipt = Receipt.begin(self.root / 'context-runs', {'product': self.src},
+                                     'server/isolated', tests, test_contexts=contexts)
+        self.receipt.record('edt-export', {'projects': {'product': {'xml_hash': tree_hash(exported_tree(self.xml))}}})
+
+    def test_explicit_managed_client(self):
+        self.with_contexts(['Tests.One'], {'Tests.One': 'КлиентУправляемоеПриложение'})
+        self.started()
+        self.report('<testcase classname="Tests.Клиент" name="One" context="КлиентУправляемоеПриложение"/>')
+        self.receipt.runtime('after', 'server/isolated', self.extensions)
+        self.assertTrue(self.receipt.junit(0, True)['passed'])
+
+    def test_managed_client_cannot_replace_server(self):
+        self.started()
+        self.report('<testcase classname="Tests.Клиент" name="One" context="КлиентУправляемоеПриложение"/>')
+        self.receipt.runtime('after', 'server/isolated', self.extensions)
+        with self.assertRaisesRegex(VerificationError, 'Unexpected test context'):
+            self.receipt.junit(0, True)
+
+    def test_server_cannot_replace_declared_client(self):
+        self.with_contexts(['Tests.One'], {'Tests.One': 'КлиентУправляемоеПриложение'})
+        self.started()
+        self.report()
+        self.receipt.runtime('after', 'server/isolated', self.extensions)
+        with self.assertRaisesRegex(VerificationError, 'Unexpected test context'):
+            self.receipt.junit(0, True)
+
+    def test_mixed_tests_require_their_own_exact_context(self):
+        self.with_contexts(['Tests.One', 'Tests.Two'],
+                           {'Tests.One': 'Сервер', 'Tests.Two': 'КлиентУправляемоеПриложение'})
+        self.started()
+        self.report('<testcase classname="Tests" name="One" context="Сервер"/>'
+                    '<testcase classname="Tests" name="Two" context="КлиентУправляемоеПриложение"/>')
+        self.receipt.runtime('after', 'server/isolated', self.extensions)
+        self.assertEqual(self.receipt.junit(0, True)['total'], 2)
+
+    def test_incomplete_or_extra_context_mapping_is_refused(self):
+        for contexts in ({}, {'Tests.Other': 'Сервер'},
+                         {'Tests.One': 'Сервер', 'Tests.Extra': 'Сервер'}, ['Сервер']):
+            with self.subTest(contexts=contexts), self.assertRaises(VerificationError):
+                Receipt.begin(self.root / 'invalid-contexts', {'product': self.src},
+                              'server/isolated', ['Tests.One'], test_contexts=contexts)
+
+    def test_ordinary_and_unknown_contexts_are_refused(self):
+        for value in ('КлиентОбычноеПриложение', 'Клиент', 'ВнешнееСоединение', '', None):
+            with self.subTest(value=value), self.assertRaises(VerificationError):
+                Receipt.begin(self.root / 'invalid-contexts', {'product': self.src},
+                              'server/isolated', ['Tests.One'], test_contexts={'Tests.One': value})
+
     def test_source_edit_add_delete(self):
         for action in ('edit', 'add', 'delete'):
             with self.subTest(action=action):

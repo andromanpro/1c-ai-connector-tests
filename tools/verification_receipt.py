@@ -29,6 +29,17 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def expected_contexts(tests, contexts=None):
+    """Bind each exact test to server or managed-client execution at capture time."""
+    if contexts is None:
+        return {name: 'Сервер' for name in tests}
+    require(isinstance(contexts, dict) and set(contexts) == set(tests),
+            'Expected contexts must match every selected test exactly')
+    require(all(value in ('Сервер', 'КлиентУправляемоеПриложение') for value in contexts.values()),
+            'Only server and managed-client test contexts are supported')
+    return dict(sorted(contexts.items()))
+
+
 def manifest(roots):
     result = {}
     for label, directory in sorted(roots.items()):
@@ -134,12 +145,14 @@ class Receipt:
                 (self.folder / 'inputs.sha256').read_text().strip(), 'Inputs were modified')
         self.spec = json.loads((self.folder / 'inputs.json').read_text(encoding='utf-8'))
         require(self.folder.name == self.spec['run_id'], 'Wrong run directory')
+        self.test_contexts = expected_contexts(self.spec['tests'], self.spec.get('test_contexts'))
 
     @classmethod
-    def begin(cls, output_root, roots, target, tests):
+    def begin(cls, output_root, roots, target, tests, test_contexts=None):
         require(target and isinstance(target, str), 'An explicit public base ID is required')
         require(tests and len(tests) == len(set(tests)), 'Empty or duplicate expected tests')
         require(all('.' in x for x in tests), 'Tests must include module and method')
+        contexts = expected_contexts(tests, test_contexts)
         roots = {k: str(Path(v).resolve(strict=True)) for k, v in roots.items()}
         output = Path(output_root).resolve()
         require(all(not output.is_relative_to(Path(v)) for v in roots.values()),
@@ -149,7 +162,8 @@ class Receipt:
         folder.mkdir(parents=True, exist_ok=False)
         files = manifest(roots)
         data = {'schema': 1, 'run_id': run_id, 'roots': roots, 'target': target,
-                'tests': sorted(tests), 'source_files': files, 'source_hash': tree_hash(files),
+                'tests': sorted(tests), 'test_contexts': contexts,
+                'source_files': files, 'source_hash': tree_hash(files),
                 'verifier_sha256': digest(Path(__file__).read_bytes())}
         with zipfile.ZipFile(folder / 'sources.zip', 'x', zipfile.ZIP_DEFLATED) as archive:
             for name in files:
@@ -222,9 +236,10 @@ class Receipt:
         cases = list(root.iter('testcase'))
         names = [c.attrib.get('classname', '').split('.')[0] + '.' + c.attrib['name'] for c in cases]
         counts = collections.Counter(names)
-        require(all(c.attrib.get('context') == 'Сервер' for c in cases), 'Unexpected test context')
         require(all(n == 1 for n in counts.values()), 'Duplicate test execution')
         require(sorted(names) == self.spec['tests'], 'Missing or unexpected tests')
+        require(all(c.attrib.get('context') == self.test_contexts[name] for c, name in zip(cases, names)),
+                'Unexpected test context')
         require(not any(list(c.iter(tag)) for c in cases for tag in ('failure', 'error', 'skipped')),
                 'JUnit contains failures, errors or skipped tests')
         return self.record('junit-verified', {'sha256': digest(report.read_bytes()), 'total': len(cases),

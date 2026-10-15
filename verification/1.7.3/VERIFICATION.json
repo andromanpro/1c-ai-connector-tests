@@ -1,0 +1,92 @@
+{
+  "version": "1.7.3",
+  "run_id": "20261015T203947Z-f0d28c647e8f",
+  "source_hash": "b4a89fdc357a535dc18843d8982c9991a5d6c234137f92097e16b6d6034f2819",
+  "source_files": 365,
+  "source_to_git": "source-to-git.json",
+  "artifacts": {
+    "ИИКона": {
+      "sha256": "ef14790502aed5a90ad4537d6139d500033bb5bcd7a99d0bc3bf0ed7ca781d5b",
+      "version": "1.7.3",
+      "active": true
+    },
+    "Тесты": {
+      "sha256": "efdbf332a1c805cc92461b6a166d9cbfe806a8d10eab99bf6c83863d22559dc4",
+      "version": "1.7.3",
+      "active": true
+    }
+  },
+  "yaxunit": {
+    "run": "F:\\temp\\iikona-audit-20261013\\runs\\20261015T203947Z-f0d28c647e8f",
+    "source_hash": "b4a89fdc357a535dc18843d8982c9991a5d6c234137f92097e16b6d6034f2819",
+    "tests": 827,
+    "passed": 827,
+    "contexts": {
+      "Сервер": 825,
+      "КлиентУправляемоеПриложение": 2
+    },
+    "junit_sha256": "564168c4549f97e4aa350e5c670cb402d7e13f2ead9697958a42a7f512816ec3",
+    "extensions": {
+      "ИИКона": {
+        "sha256": "ef14790502aed5a90ad4537d6139d500033bb5bcd7a99d0bc3bf0ed7ca781d5b",
+        "version": "1.7.3",
+        "active": true
+      },
+      "Тесты": {
+        "sha256": "efdbf332a1c805cc92461b6a166d9cbfe806a8d10eab99bf6c83863d22559dc4",
+        "version": "1.7.3",
+        "active": true
+      }
+    },
+    "elapsed_s": 117.7,
+    "client_exited_normally": true,
+    "fixture_requests": 13,
+    "fixture_scenarios": {
+      "rounds": 2,
+      "attachment": 2,
+      "denied": 2,
+      "failure": 2,
+      "limit": 2,
+      "plain": 1,
+      "masked": 2
+    }
+  },
+  "verification_tool_unit_tests": {
+    "passed": 63,
+    "scope": "receipt, runner and context guards; executed before final source capture"
+  },
+  "preservation": {
+    "exact_match": true,
+    "tables": 18,
+    "rows": 512,
+    "settings_and_users": true,
+    "secure_owners": 2,
+    "performed_after_final_run": true
+  },
+  "sonar": {
+    "analysis": "AaFBUqu8XCBQGdijVtMI",
+    "status": "SUCCESS",
+    "gate": "OK",
+    "bugs": 0,
+    "vulnerabilities": 0,
+    "code_smells": 48,
+    "new_issues": 0,
+    "reviewed_hotspots": 28,
+    "modules": 85,
+    "profile_rules": 160
+  },
+  "standards": {
+    "gate": "clean",
+    "config": "existing project config, sentinel std792",
+    "evidence": "v8std-evidence.md"
+  },
+  "limits": [
+    "Selected test set, not all execution contexts",
+    "HTTP with local synthetic models, not a live test of every cloud model",
+    "Previous EDT type-description debt remains",
+    "No 50-200 concurrent-user load claim",
+    "External MCP client and per-model tool lists remain planned",
+    "Examiner is a separate pending stage"
+  ],
+  "historical_results": "Previous 27/27 and 827/827 before two style corrections are retained separately; not substituted for this run"
+}

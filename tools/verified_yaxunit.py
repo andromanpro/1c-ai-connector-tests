@@ -1,4 +1,4 @@
-"""Run a frozen server test selection; refuse a different base or installed CFE.
+"""Run frozen server/managed-client tests; refuse a different base or CFE.
 
 Usage: py verified_yaxunit.py --run-folder RECEIPT --base-config PRIVATE_JSON
 The private JSON has connection, cluster, infobase, lease_key and

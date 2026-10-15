@@ -1,0 +1,77 @@
+"""Synthetic loopback model for expert tool-cycle integration tests."""
+from contextlib import contextmanager
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from threading import Thread
+import json
+
+@contextmanager
+def local_expert_fixture():
+    events=[]
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self,*args):pass
+        def send_json(self,code,data):
+            raw=json.dumps(data,ensure_ascii=False).encode("utf-8")
+            self.send_response(code);self.send_header("Content-Type","application/json; charset=utf-8")
+            self.send_header("Content-Length",str(len(raw)));self.end_headers();self.wfile.write(raw)
+        def do_POST(self):
+            payload=json.loads(self.rfile.read(int(self.headers.get("Content-Length","0"))))
+            scenario=self.path.strip("/").split("/")[0]
+            event={"scenario":scenario,"body":payload,"checks":[]}
+            events.append(event)
+            def check(value,label):
+                event["checks"].append({"label":label,"passed":bool(value)})
+                if not value:raise AssertionError(label)
+            try:
+                check(str(payload.get("model","")).startswith("expert-test-"),"synthetic_model_only")
+                messages=payload.get("messages",[])
+                tools=payload.get("tools",[])
+                results=[x for x in messages if x.get("role")=="tool"]
+                if scenario=="plain":
+                    check(not tools,"ordinary_route_has_no_tools")
+                    text="PLAIN_OK"
+                else:
+                    check(scenario!="must-not-send","unsupported_model_does_not_reach_http")
+                    if scenario!="limit" or not results:
+                        check({t["function"]["name"] for t in tools}=={"get_metadata_tree","get_object_structure","get_configuration_info","execute_query"},"four_builtin_tools")
+                    if scenario=="rounds":
+                        check([m["role"] for m in messages[:4]]==["system","user","assistant","user"],"history_role_order")
+                        check([m["content"] for m in messages[:4]]==["инструкция","первый вопрос","первый ответ","уточнение"],"history_content")
+                    if scenario=="attachment":
+                        user=next(m for m in messages if m.get("role")=="user")
+                        check(isinstance(user["content"],list),"attachment_is_array")
+                        check(user["content"][0]["text"]=="посмотри изображение","attachment_prompt_text")
+                        check(user["content"][1]["image_url"]["url"]=="https://example.test/image.png","attachment_url_preserved")
+                    if scenario=="masked":
+                        check("tools.person@example.org" not in json.dumps(payload,ensure_ascii=False),"original_email_absent_in_all_rounds")
+                    if not results:
+                        name="drop_table" if scenario=="denied" else "get_configuration_info"
+                        data={"id":"fixture-round-1","object":"chat.completion","model":"fixture-expert-tools",
+                              "choices":[{"index":0,"message":{"role":"assistant","content":None,
+                               "tool_calls":[{"id":"call_config","type":"function","function":{"name":name,"arguments":"{}"}}]},
+                               "finish_reason":"tool_calls"}],"usage":{"prompt_tokens":10,"completion_tokens":5,"total_tokens":15}}
+                        self.send_json(200,data);return
+                    check(results[-1]["tool_call_id"]=="call_config","tool_response_matches_call")
+                    check(bool(results[-1].get("content")),"tool_result_is_nonempty")
+                    if scenario=="denied":
+                        check("не разрешен" in results[-1]["content"],"unknown_tool_refused")
+                        text="DENIED_OK"
+                    elif scenario=="failure":
+                        self.send_json(400,{"error":{"message":"synthetic second-round failure"}});return
+                    elif scenario=="limit":
+                        check(not tools,"final_round_has_no_tools")
+                        text="LIMIT_OK"
+                    elif scenario=="masked":
+                        text=next(m["content"] for m in messages if m.get("role")=="user")
+                    else:text="TOOLS_OK"
+                data={"id":"fixture-round-2","object":"chat.completion","model":"fixture-expert-tools",
+                      "choices":[{"index":0,"message":{"role":"assistant","content":text},"finish_reason":"stop"}],
+                      "usage":{"prompt_tokens":20,"completion_tokens":7,"total_tokens":27}}
+                self.send_json(200,data)
+            except Exception as exc:
+                event["fixture_error"]=str(exc)
+                self.send_json(400,{"error":{"message":"fixture: "+str(exc)}})
+    server=ThreadingHTTPServer(("127.0.0.1",18770),Handler)
+    thread=Thread(target=server.serve_forever,daemon=True);thread.start()
+    try:yield events
+    finally:server.shutdown();server.server_close();thread.join(5)
+
