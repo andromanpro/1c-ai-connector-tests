@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="7cb20341-0399-4f9a-990f-bca4e2b9c0cb">
+  <name>Тесты_КИИ_ПраваЖурнала</name>
+  <synonym>
+    <key>ru</key>
+    <value>Проверки прав журнала ИИ</value>
+  </synonym>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>

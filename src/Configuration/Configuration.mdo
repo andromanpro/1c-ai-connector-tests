@@ -27,7 +27,7 @@
   <usePurposes>PersonalComputer</usePurposes>
   <scriptVariant>Russian</scriptVariant>
   <vendor>Androman.pro</vendor>
-  <version>1.7.1</version>
+  <version>1.7.2-audit-34</version>
   <content>CommonModule.Тесты_КИИ_RAGQdrant</content>
   <content>CommonModule.Тесты_КИИ_МониторингОшибок</content>
   <content>CommonModule.Тесты_КИИ_МаркдаунПарсер</content>
@@ -75,4 +75,8 @@
   <commonModules>CommonModule.Тесты_КИИ_ПакетноеЧтение</commonModules>
   <commonModules>CommonModule.Тесты_КИИ_КонтрактыВозврата</commonModules>
   <commonModules>CommonModule.Тесты_КИИ_ОчередьQdrant</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_ПраваЖурнала</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_RAGИзмерения</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_ПакетыЭмбеддингов</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_СоставБиблиотеки</commonModules>
 </mdclass:Configuration>

@@ -73,7 +73,11 @@ class Handler(BaseHTTPRequestHandler):
                                 else:state['stored_points'][key]=copy.deepcopy(point);state['accepted']+=1
                         if failed:break
                         results.append({'operation_id':len(results)+1,'status':'completed'})
-                    if failed:code=500;response={'status':'error','result':'fixture partial acceptance then failure'}
+                    if failed:
+                        code=int(fixture.get('fail_code',500 if fixture.get('fail_all') else 400))
+                        message=('common fixture failure' if fixture.get('fail_all')
+                                 else 'Wrong input: Vector dimension error: expected dim: 3, got 2')
+                        response={'status':{'error':message}}
                     else:response={'result':[] if fixture.get('malformed_result') else results,'status':'ok'}
                 finally:
                     with lock:state['active']-=1

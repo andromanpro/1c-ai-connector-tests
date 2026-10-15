@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="9ce93300-f738-4e9f-a0c0-3e83ad583b9e">
+  <name>Тесты_КИИ_СоставБиблиотеки</name>
+  <synonym>
+    <key>ru</key>
+    <value>Проверки состава библиотеки ИИкона</value>
+  </synonym>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="5654025c-1262-4b9a-8a3a-c795d864b188">
+  <name>Тесты_КИИ_RAGИзмерения</name>
+  <comment>K06/K07: измерения полного подготовительного пути на синтетическом готовом индексе.</comment>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>
