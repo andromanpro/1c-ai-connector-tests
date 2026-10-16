@@ -1,0 +1,14 @@
+{
+  "total": 78,
+  "failures": 0,
+  "errors": 0,
+  "passed": true,
+  "modules": [
+    "test_verification_receipt",
+    "test_yaxunit_startup_guard",
+    "test_runtime_session_guard",
+    "test_embedding_fixture",
+    "test_designer_authentication",
+    "test_client_preflight"
+  ]
+}

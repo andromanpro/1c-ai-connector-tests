@@ -108,6 +108,24 @@ def xml_value(node):
                  '{http://v8.1c.ru/8.2/roles}right'}
     if node.tag in unordered:
         children.sort(key=repr)
+    # TypeDescription alternatives form a set. Keep qualifiers, duplicate
+    # alternatives and every type name; only reorder the core:Type leaves.
+    core = '{http://v8.1c.ru/8.1/data/core}'
+    form = '{http://v8.1c.ru/8.3/xcf/logform}'
+    roles = '{http://v8.1c.ru/8.2/roles}'
+    unordered_leaf = None
+    if node.tag in (md + 'Type', form + 'Type'):
+        unordered_leaf = core + 'Type'
+    elif node.tag == roles + 'restrictionByCondition':
+        # Field order within one restriction does not change its scope.
+        # The field/condition association and the empty default scope stay intact.
+        unordered_leaf = roles + 'field'
+    if unordered_leaf is not None:
+        positions = [i for i, child in enumerate(children)
+                     if child[0] == unordered_leaf and not child[1] and not child[3]]
+        values = sorted((children[i] for i in positions), key=repr)
+        for index, value in zip(positions, values):
+            children[index] = value
     text = node.text or ''
     if (len(node) or name == 'InternalInfo') and not text.strip():
         text = ''
@@ -218,7 +236,14 @@ class Receipt:
             require(item['version'], f'Missing runtime version: {name}')
             actual = digest(Path(item['file']).read_bytes())
             require(actual == build['artifacts'][name], f'Installed CFE differs: {name}')
-            observed[name] = {'sha256': actual, 'version': item['version'], 'active': True}
+            require('safe_mode' in item and (type(item['safe_mode']) is bool or
+                    (isinstance(item['safe_mode'], str) and bool(item['safe_mode'].strip()))),
+                    f'Missing or invalid runtime safe mode: {name}')
+            observed[name] = {'sha256': actual, 'version': item['version'], 'active': True,
+                              'safe_mode': item['safe_mode']}
+        if stage == 'after':
+            before = json.loads((self.folder / 'runtime-before.json').read_text(encoding='utf-8'))
+            require(before['extensions'] == observed, 'Runtime extension policy or identity changed')
         return self.record('runtime-' + stage, {'target': actual_target, 'extensions': observed})
 
     def prepare_test(self, configuration):

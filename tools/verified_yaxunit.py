@@ -86,12 +86,13 @@ def capture_runtime(receipt, config, stage):
             name = str(entry.Имя)
             path = folder / (name + '.cfe')
             entry.ПолучитьДанные().Записать(str(path))
-            item = {'file': str(path), 'active': bool(entry.Активно), 'version': str(entry.Версия)}
+            item = {'file': str(path), 'active': bool(entry.Активно), 'version': str(entry.Версия),
+                    'safe_mode': entry.БезопасныйРежим}
             if name in build['artifacts']:
                 extensions[name] = item
             else:
                 dependencies[name] = {'sha256': digest(path.read_bytes()), 'active': item['active'],
-                                      'version': item['version']}
+                                      'version': item['version'], 'safe_mode': item['safe_mode']}
         dependencies['base'] = {'name': str(base.Метаданные.Имя), 'version': str(base.Метаданные.Версия)}
         if stage == 'after':
             before = json.loads((receipt.folder / 'dependencies-before.json').read_text(encoding='utf-8'))
@@ -190,7 +191,8 @@ def main():
         from qdrant_fixture import local_fixture
         from diagram_fixture import local_diagram_fixture
         from legacy_model_fixture import local_model_fixture
-        with local_fixture(), local_diagram_fixture(), local_model_fixture() as events:
+        from expert_tools_fixture import local_expert_fixture
+        with local_fixture(), local_diagram_fixture(), local_model_fixture() as events, local_expert_fixture() as expert_events:
             startup = subprocess.STARTUPINFO()
             startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startup.wShowWindow = 0
@@ -219,6 +221,13 @@ def main():
                     print('Test client running:', round(elapsed), 's', flush=True)
                     notice = time.monotonic() + 45
                 time.sleep(1)
+        (receipt.folder / 'expert-fixture-events.json').write_text(
+            json.dumps(expert_events, ensure_ascii=False, indent=2), encoding='utf-8')
+        expert_checks_passed = (not any('fixture_error' in event for event in expert_events)
+                                and all(check['passed'] for event in expert_events for check in event.get('checks', [])))
+        receipt.record('expert-fixture-result', {'requests': len(expert_events),
+                       'scenarios': dict(collections.Counter(event['scenario'] for event in expert_events)),
+                       'checks_passed': expert_checks_passed})
         receipt.record('client-exited', {'pid': process.pid, 'exit_code': process.returncode,
                                         'elapsed_s': round(time.monotonic() - started, 1),
                                         'normal_close_requested': close_requested,
@@ -226,6 +235,7 @@ def main():
                                         'fixture_requests': len(events),
                                         'fixture_scenarios': dict(collections.Counter(e['scenario'] for e in events))})
         capture_runtime(receipt, config, 'after')
+        require(expert_checks_passed, 'Expert HTTP fixture checks failed')
         result = receipt.junit(process.returncode, process.poll() is not None, close_requested)
         print(json.dumps(result, ensure_ascii=False))
         return 0

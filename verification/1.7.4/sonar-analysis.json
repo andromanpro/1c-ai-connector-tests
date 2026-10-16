@@ -1,0 +1,15 @@
+{
+  "analysis": "AaFEBnOhXCBQGdijV2Kf",
+  "ce": "SUCCESS",
+  "gate": "OK",
+  "issues": 48,
+  "types": {
+    "CODE_SMELL": 48
+  },
+  "new_issues": 0,
+  "hotspots": 28,
+  "hotspot_statuses": {
+    "REVIEWED": 28
+  },
+  "profiles_equal_except_last_used": true
+}

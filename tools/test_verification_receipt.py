@@ -20,7 +20,7 @@ class ReceiptTest(unittest.TestCase):
         self.cfe = self.root / 'product.cfe'
         self.cfe.write_bytes(b'exact compiled extension')
         self.receipt = Receipt.begin(self.root / 'runs', {'product': self.src}, 'server/isolated', ['Tests.One'])
-        self.extensions = {'product': {'file': self.cfe, 'active': True, 'version': '1.7.2'}}
+        self.extensions = {'product': {'file': self.cfe, 'active': True, 'version': '1.7.2', 'safe_mode': False}}
         self.receipt.record('edt-export', {'projects': {'product': {'xml_hash': tree_hash(exported_tree(self.xml))}}})
 
     def build(self):
@@ -35,6 +35,39 @@ class ReceiptTest(unittest.TestCase):
 
     def report(self, body='<testcase classname="Tests.Сервер" name="One" context="Сервер"/>'):
         (self.receipt.folder / 'junit.xml').write_text('<testsuite>' + body + '</testsuite>', encoding='utf-8')
+
+    def test_missing_runtime_safe_mode_is_refused(self):
+        self.build()
+        del self.extensions['product']['safe_mode']
+        with self.assertRaisesRegex(VerificationError, 'runtime safe mode'):
+            self.receipt.runtime('before', 'server/isolated', self.extensions)
+
+    def test_runtime_safe_mode_requires_boolean_or_nonempty_profile(self):
+        self.build()
+        for value in (None, 0, 1, [], {}, '', '  '):
+            with self.subTest(value=value), self.assertRaisesRegex(VerificationError, 'runtime safe mode'):
+                self.extensions['product']['safe_mode'] = value
+                self.receipt.runtime('before', 'server/isolated', self.extensions)
+
+    def test_runtime_safe_mode_change_is_refused(self):
+        self.started()
+        self.extensions['product']['safe_mode'] = True
+        with self.assertRaisesRegex(VerificationError, 'policy or identity changed'):
+            self.receipt.runtime('after', 'server/isolated', self.extensions)
+
+    def test_named_runtime_profile_is_preserved(self):
+        self.extensions['product']['safe_mode'] = 'FixtureOnly'
+        self.started()
+        self.report()
+        self.receipt.runtime('after', 'server/isolated', self.extensions)
+        self.assertTrue(self.receipt.junit(0, True)['passed'])
+
+    def test_named_runtime_profile_change_is_refused(self):
+        self.extensions['product']['safe_mode'] = 'FixtureOnly'
+        self.started()
+        self.extensions['product']['safe_mode'] = 'DifferentProfile'
+        with self.assertRaisesRegex(VerificationError, 'policy or identity changed'):
+            self.receipt.runtime('after', 'server/isolated', self.extensions)
 
     def test_complete(self):
         self.started()
@@ -192,6 +225,70 @@ class ReceiptTest(unittest.TestCase):
     def test_nonempty_default_is_not_ignored(self):
         a = '<Properties xmlns="http://v8.1c.ru/8.3/MDClasses"><FillValue>old</FillValue></Properties>'
         self.assertNotEqual(*self.xml_pair(a, a.replace('old', 'new')))
+
+    def type_description(self, body, namespace='http://v8.1c.ru/8.3/MDClasses'):
+        return ('<Type xmlns="' + namespace + '" xmlns:v8="http://v8.1c.ru/8.1/data/core">'
+                + body + '</Type>')
+
+    def test_type_alternative_order_only(self):
+        a = '<v8:Type>cfg:CatalogRef.A</v8:Type>'
+        b = '<v8:Type>cfg:CatalogRef.B</v8:Type>'
+        for ns in ('http://v8.1c.ru/8.3/MDClasses', 'http://v8.1c.ru/8.3/xcf/logform'):
+            with self.subTest(namespace=ns):
+                self.assertEqual(*self.xml_pair(self.type_description(a + b, ns),
+                                               self.type_description(b + a, ns)))
+
+    def test_changed_type_alternative_is_refused(self):
+        a = self.type_description('<v8:Type>cfg:CatalogRef.A</v8:Type><v8:Type>cfg:CatalogRef.B</v8:Type>')
+        self.assertNotEqual(*self.xml_pair(a, a.replace('CatalogRef.B', 'CatalogRef.C')))
+
+    def test_missing_or_duplicate_type_is_refused(self):
+        a = self.type_description('<v8:Type>cfg:CatalogRef.A</v8:Type>')
+        b = self.type_description('<v8:Type>cfg:CatalogRef.A</v8:Type><v8:Type>cfg:CatalogRef.A</v8:Type>')
+        self.assertNotEqual(*self.xml_pair(a, b))
+
+    def test_type_qualifiers_are_preserved(self):
+        a = self.type_description('<v8:Type>xs:string</v8:Type><v8:StringQualifiers><v8:Length>36</v8:Length></v8:StringQualifiers>')
+        self.assertNotEqual(*self.xml_pair(a, a.replace('>36<', '>37<')))
+
+    def restriction(self, fields, condition):
+        return ('<restrictionByCondition>' + ''.join('<field>' + x + '</field>' for x in fields)
+                + '<condition>' + condition + '</condition></restrictionByCondition>')
+
+    def rights_description(self, *restrictions):
+        return ('<Rights xmlns="http://v8.1c.ru/8.2/roles"><object><name>Catalog.A</name>'
+                '<right><name>Read</name><value>true</value>' + ''.join(restrictions)
+                + '</right></object></Rights>')
+
+    def test_rls_field_order_inside_one_condition_only(self):
+        a = self.rights_description(self.restriction(['A', 'B'], 'Owner=CurrentUser'))
+        b = self.rights_description(self.restriction(['B', 'A'], 'Owner=CurrentUser'))
+        self.assertEqual(*self.xml_pair(a, b))
+
+    def test_rls_changed_condition_is_refused(self):
+        a = self.rights_description(self.restriction(['A', 'B'], 'Owner=CurrentUser'))
+        self.assertNotEqual(*self.xml_pair(a, a.replace('Owner=CurrentUser', 'true')))
+
+    def test_rls_missing_default_scope_is_refused(self):
+        allowed = self.restriction(['A'], 'Owner=CurrentUser')
+        a = self.rights_description(allowed, self.restriction([], 'false'))
+        self.assertNotEqual(*self.xml_pair(a, self.rights_description(allowed)))
+
+    def test_rls_fields_cannot_move_between_conditions(self):
+        a = self.rights_description(self.restriction(['A'], 'Owner=CurrentUser'), self.restriction(['B'], 'false'))
+        b = self.rights_description(self.restriction(['B'], 'Owner=CurrentUser'), self.restriction(['A'], 'false'))
+        self.assertNotEqual(*self.xml_pair(a, b))
+
+    def test_form_columns_and_ordinary_arrays_remain_ordered(self):
+        for tag in ('Columns', 'ChildItems', 'Attributes', 'Type'):
+            with self.subTest(tag=tag):
+                self.assertNotEqual(*self.xml_pair('<' + tag + '><A/><B/></' + tag + '>',
+                                                  '<' + tag + '><B/><A/></' + tag + '>'))
+
+    def test_invalid_or_changed_group_reference_is_not_ignored(self):
+        a = '<Form xmlns="http://v8.1c.ru/8.3/xcf/logform"><UserSettingsGroup>G</UserSettingsGroup></Form>'
+        self.assertNotEqual(*self.xml_pair(a, a.replace('>G<', '>Other<')))
+        self.assertNotEqual(*self.xml_pair(a, '<Form xmlns="http://v8.1c.ru/8.3/xcf/logform"/>'))
 
 
 if __name__ == '__main__':

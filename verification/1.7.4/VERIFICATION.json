@@ -1,0 +1,93 @@
+{
+  "version": "1.7.4",
+  "source_hash": "e966e798ef197a2f8cb34c2fda112a15bb35aa97afc86946f622e51f3831254a",
+  "run_id": "20261016T091930Z-6fcc592a8305",
+  "source_files": 367,
+  "artifacts": {
+    "ИИКона": "01c221e3ab1d8ebc0f8d87e8e8fe305aafa814cb0a8831c459c259e1c2179882",
+    "Тесты": "67b792d3d618ef76d2b5ead846c05a5af3ebbca9a3848e913cdec9f3e59349e1"
+  },
+  "yaxunit": {
+    "run": "F:\\temp\\iikona-audit-20261013\\runs\\20261016T091930Z-6fcc592a8305",
+    "source_hash": "e966e798ef197a2f8cb34c2fda112a15bb35aa97afc86946f622e51f3831254a",
+    "same_cfe_as_targeted": true,
+    "runner_exit": 0,
+    "total": 832,
+    "failed": [],
+    "contexts": {
+      "Сервер": 830,
+      "КлиентУправляемоеПриложение": 2
+    },
+    "fixture_requests": 21,
+    "fixture_scenarios": {
+      "rounds": 6,
+      "attachment": 2,
+      "denied": 2,
+      "failure": 4,
+      "limit": 2,
+      "plain": 2,
+      "masked": 3
+    },
+    "fixture_checks_passed": true,
+    "junit_sha256": "6632d9b69db79e76a0ad92dc4097f25a574822aaec34b4fb04b3d815b46c020b"
+  },
+  "python_tests": {
+    "total": 78,
+    "failures": 0,
+    "errors": 0,
+    "passed": true,
+    "modules": [
+      "test_verification_receipt",
+      "test_yaxunit_startup_guard",
+      "test_runtime_session_guard",
+      "test_embedding_fixture",
+      "test_designer_authentication",
+      "test_client_preflight"
+    ]
+  },
+  "sonar": {
+    "analysis": "AaFEBnOhXCBQGdijV2Kf",
+    "ce": "SUCCESS",
+    "gate": "OK",
+    "issues": 48,
+    "types": {
+      "CODE_SMELL": 48
+    },
+    "new_issues": 0,
+    "hotspots": 28,
+    "hotspot_statuses": {
+      "REVIEWED": 28
+    },
+    "profiles_equal_except_last_used": true
+  },
+  "standards": {
+    "gate": "clean",
+    "config": "existing project v8std.config.json; std792"
+  },
+  "preservation": {
+    "tables_and_parts": 20,
+    "users": 2,
+    "model_keys": 1,
+    "all_equal_before": true
+  },
+  "process": {
+    "fixture_owner": "verified_yaxunit",
+    "public_wrapper_checked": true,
+    "compiled_cfe_checked_before_after": true,
+    "full_orchestrators_frozen": true,
+    "no_rebuild_after_verification": true
+  },
+  "limits": [
+    "Selected test set and stated contexts",
+    "Synthetic HTTP models; not all live cloud providers",
+    "48 prior CODE_SMELL remain",
+    "Prior EDT type-description debt remains",
+    "Multi-base connections and expanded chat settings are separate backlog",
+    "Examiner is separate pending work"
+  ],
+  "format_review": {
+    "scoped_bslfmt_passed": true,
+    "git_diff_crlf_accounted_for": true,
+    "remaining": "One blank line at EOF in frozen test module; exact verified source bytes preserved"
+  }
+}
