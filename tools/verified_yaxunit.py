@@ -192,7 +192,11 @@ def main():
         from diagram_fixture import local_diagram_fixture
         from legacy_model_fixture import local_model_fixture
         from expert_tools_fixture import local_expert_fixture
-        with local_fixture(), local_diagram_fixture(), local_model_fixture() as events, local_expert_fixture() as expert_events:
+        from mcp_database_fixtures import local_database_fixture, require_clean_events, requires_database_fixture
+        database_enabled = requires_database_fixture(selection)
+        with (local_fixture(), local_diagram_fixture(), local_model_fixture() as events,
+              local_expert_fixture() as expert_events,
+              local_database_fixture(enabled=database_enabled) as database_events):
             startup = subprocess.STARTUPINFO()
             startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startup.wShowWindow = 0
@@ -228,6 +232,11 @@ def main():
         receipt.record('expert-fixture-result', {'requests': len(expert_events),
                        'scenarios': dict(collections.Counter(event['scenario'] for event in expert_events)),
                        'checks_passed': expert_checks_passed})
+        (receipt.folder / 'database-fixture-events.json').write_text(
+            json.dumps(database_events, ensure_ascii=False, indent=2), encoding='utf-8')
+        receipt.record('database-fixture-result', {'requests': len(database_events),
+                       'scenarios': dict(collections.Counter(event['scenario'] for event in database_events)),
+                       'checks_passed': not any(event.get('fixture_error') for event in database_events)})
         receipt.record('client-exited', {'pid': process.pid, 'exit_code': process.returncode,
                                         'elapsed_s': round(time.monotonic() - started, 1),
                                         'normal_close_requested': close_requested,
@@ -236,6 +245,7 @@ def main():
                                         'fixture_scenarios': dict(collections.Counter(e['scenario'] for e in events))})
         capture_runtime(receipt, config, 'after')
         require(expert_checks_passed, 'Expert HTTP fixture checks failed')
+        require_clean_events(database_events)
         result = receipt.junit(process.returncode, process.poll() is not None, close_requested)
         print(json.dumps(result, ensure_ascii=False))
         return 0

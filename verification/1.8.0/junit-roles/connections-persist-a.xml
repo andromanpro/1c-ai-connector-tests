@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite id="0" name="ПраваПодключенийКБазам [Сервер]" classname="Тесты_КИИ_ПраваПодключенийКБазам" tests="1" errors="0" skipped="0" failures="0" timestamp="2026-10-17T14:54:10" time="0.07" package="Тесты" context="Сервер">
+		<testcase name="СохранитьЛичныйВходДляДругогоСеанса" classname="Тесты_КИИ_ПраваПодключенийКБазам.СохранитьЛичныйВходДляДругогоСеанса" time="0.046" context="Сервер"/>
+		<properties>
+			<property name="context" value="Сервер"/>
+		</properties>
+	</testsuite>
+	<properties>
+		<property name="Конфигурация" value="Демонстрационная конфигурация &quot;Библиотека стандартных подсистем&quot;, редакция 3.1"/>
+		<property name="ВерсияКонфигурации" value="3.1.11.392"/>
+		<property name="ВерсияПлатформы" value="8.3.27.1989"/>
+		<property name="ИнформационнаяСреда" value="DEV"/>
+		<property name="ТестовыйДвижок" value="YAXUNIT"/>
+		<property name="ВерсияТестовогоДвижка" value="25.12"/>
+		<property name="ВстроенныйЯзык" value="ru"/>
+		<property name="ОперационнаяСистемаКлиент" value="Windows"/>
+		<property name="АрхитектураКлиент" value="x86_64"/>
+		<property name="ОперационнаяСистемаСервер" value="Windows"/>
+		<property name="АрхитектураСервер" value="x86_64"/>
+		<property name="ФайловаяБаза" value="false"/>
+		<property name="ОбычноеПриложение" value="false"/>
+		<property name="ВебКлиент" value="false"/>
+		<property name="ТолстыйКлиент" value="true"/>
+		<property name="ВремяЗапуска" value="2026-10-17T14:54:10"/>
+		<property name="Расширения" value="    |ИИКона |1.8.0 |Нет |Нет |
+    |Тесты |1.8.0 |Нет |Нет |
+    |YAXUNIT |25.12 |Нет |Нет |"/>
+	</properties>
+</testsuites>

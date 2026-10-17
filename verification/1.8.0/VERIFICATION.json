@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "run_id": "20261017T112617Z-1e6829617c1c",
+  "source_hash": "0dafc87de98cd46c01e3c39aaeb9c30b99e9a93dc5f1609531dcbe9805f19374",
+  "product_version": "1.8.0",
+  "tests_version": "1.8.0",
+  "artifacts": {
+    "IIkona-1.8.0.cfe": {
+      "sha256": "01653ff67295b1d8d5ca1b5fb1f802943372bd5c304ce6c71831dcd529e3d567",
+      "bytes": 1895787,
+      "captured_from_installed_extension": true
+    },
+    "IIkona-tests-1.8.0.cfe": {
+      "sha256": "79f139a2b40ddd74ea36474634bbc0510d92e9ceb9d54dc839c9bf2c2eae2c7a",
+      "bytes": 232770,
+      "captured_from_installed_extension": true
+    }
+  },
+  "main": {
+    "passed": 965,
+    "total": 965,
+    "server": 946,
+    "managed_client": 19,
+    "junit_sha256": "851c43d6210022bd361abe34f840f930b40f4418cf1ca40c002ff1808030c5a5",
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "roles": {
+    "executions": 130,
+    "distinct_methods": 40,
+    "journal": 54,
+    "monitoring": 35,
+    "connections": 41,
+    "passed": true,
+    "cleanup_complete": true
+  },
+  "registered_methods": 1012,
+  "distinct_methods_exercised": 1005,
+  "external_environment_methods_not_run": 7,
+  "environment": {
+    "platform": "8.3.27.1989",
+    "parent": "БиблиотекаСтандартныхПодсистемДемо",
+    "bsp": "3.1.11.392",
+    "yaxunit": "25.12",
+    "kind": "isolated SQL test base"
+  },
+  "native_compiler": {
+    "exit_code": 0,
+    "diagnostics": 0,
+    "contexts": 7,
+    "http_context_guard_reached": true
+  },
+  "sonar": {
+    "analysis": "AaFJo7U4XCBQGdijWJVJ",
+    "gate": "OK",
+    "profile_rules": 160,
+    "raw_findings": 4,
+    "false_positives_reviewed": 3,
+    "accepted_legacy_style_deviations": 1,
+    "open_issues": 0,
+    "reviewed_hotspots": 34
+  },
+  "preservation": {
+    "passed": true,
+    "tables": 24,
+    "all_current_fields": true,
+    "users": true,
+    "constants": true,
+    "model_keys": true
+  },
+  "limitations": [
+    "7 methods dependent on external environment not run",
+    "Remaining EDT documentation/type markers and warnings are not called clean",
+    "UT/ERP live conversations and screenshots belong to the indicated dev versions",
+    "No complete provider/client/load matrix or 1C certification claimed"
+  ],
+  "source_layout": {
+    "product": "src/ and DT-INF/ in andromanpro/1c-ai-connector tag v1.8.0",
+    "tests": "src/ and DT-INF/ in andromanpro/1c-ai-connector-tests tag v1.8.0",
+    "verification_tools": "tools/ in tests repository",
+    "verification_orchestrator": "verification/1.8.0/orchestrator/ in tests repository"
+  }
+}

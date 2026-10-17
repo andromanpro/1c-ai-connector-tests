@@ -27,7 +27,7 @@
   <usePurposes>PersonalComputer</usePurposes>
   <scriptVariant>Russian</scriptVariant>
   <vendor>Androman.pro</vendor>
-  <version>1.7.4</version>
+  <version>1.8.0</version>
   <content>CommonModule.Тесты_КИИ_RAGQdrant</content>
   <content>CommonModule.Тесты_КИИ_МониторингОшибок</content>
   <content>CommonModule.Тесты_КИИ_МаркдаунПарсер</content>
@@ -80,4 +80,9 @@
   <commonModules>CommonModule.Тесты_КИИ_ПакетыЭмбеддингов</commonModules>
   <commonModules>CommonModule.Тесты_КИИ_СоставБиблиотеки</commonModules>
   <commonModules>CommonModule.Тесты_КИИ_ЧатЭкспертаКлиент</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_УдаленныеБазыMCP</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_ПодключенияКБазам</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_ПраваПодключенийКБазам</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_ФормыМоделейВызовСервера</commonModules>
+  <commonModules>CommonModule.Тесты_КИИ_КонтекстДиалога</commonModules>
 </mdclass:Configuration>

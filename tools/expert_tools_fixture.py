@@ -26,6 +26,17 @@ def local_expert_fixture():
                 messages=payload.get("messages",[])
                 tools=payload.get("tools",[])
                 results=[x for x in messages if x.get("role")=="tool"]
+                if scenario.startswith("chat-context-"):
+                    if scenario == "chat-context-error":
+                        self.send_json(400,{"error":{"message":"synthetic chat context failure"}});return
+                    from chat_context_fixture import reply
+                    self.send_json(200,reply(payload,scenario,check));return
+                if scenario.startswith("model-set-"):
+                    from model_tools_fixture import reply
+                    self.send_json(200,reply(payload,scenario,check));return
+                if scenario.startswith("database-"):
+                    from agent_database_model_fixture import database_reply
+                    self.send_json(200,database_reply(payload,scenario,check));return
                 if scenario=="plain":
                     check(not tools,"ordinary_route_has_no_tools")
                     text="PLAIN_OK"

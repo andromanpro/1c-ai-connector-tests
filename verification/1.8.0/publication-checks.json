@@ -1,0 +1,33 @@
+{
+  "iikona-github-public": {
+    "head": "23cb9ab3ab8327a83f7334450cb0ffb004b7e38f",
+    "origin_main": "23cb9ab3ab8327a83f7334450cb0ffb004b7e38f",
+    "diff_check_exit": 2,
+    "status_lines": 47,
+    "preserved_blank_line_whitespace_findings": 32,
+    "suspicious_paths": []
+  },
+  "iikona-tests-github-public": {
+    "head": "64417ec6ee585403ec17735f8c48b585baf0f503",
+    "origin_main": "64417ec6ee585403ec17735f8c48b585baf0f503",
+    "diff_check_exit": 2,
+    "status_lines": 24,
+    "preserved_blank_line_whitespace_findings": 41,
+    "synthetic_url_userinfo_control": "reserved .example host in negative URL parsing test",
+    "suspicious_paths": []
+  },
+  "iikona-guide-github-public": {
+    "head": "14760bda1a20bb26d88b54593516cffa53881aea",
+    "origin_main": "14760bda1a20bb26d88b54593516cffa53881aea",
+    "diff_check_exit": 0,
+    "status_lines": 22,
+    "suspicious_paths": []
+  },
+  "guide": {
+    "files": 66,
+    "links": 171,
+    "missing_paths": [],
+    "missing_fragments": []
+  },
+  "captured_cfe_exact": true
+}

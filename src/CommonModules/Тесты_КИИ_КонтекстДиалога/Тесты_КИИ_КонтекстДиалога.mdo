@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="241ab290-3595-4ed4-b428-c51e0c04dfb8">
+  <name>Тесты_КИИ_КонтекстДиалога</name>
+  <server>true</server>
+  <externalConnection>true</externalConnection>
+</mdclass:CommonModule>

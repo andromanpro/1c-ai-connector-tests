@@ -1,0 +1,131 @@
+[
+  {
+    "key": "AaFJPrPPXCBQGdijV6r_",
+    "rule": "bsl-language-server:DataExchangeLoading",
+    "severity": "CRITICAL",
+    "component": "iikona:xml-dump/cfe/ИИКона/Catalogs/КИИ_ПодключенияКБазам/Ext/ObjectModule.bsl",
+    "project": "iikona",
+    "line": 5,
+    "hash": "b550c09104fd284a2078ea03d07931dd",
+    "textRange": {
+      "startLine": 5,
+      "endLine": 5,
+      "startOffset": 10,
+      "endOffset": 22
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Добавьте проверку признака ОбменДанными.Загрузка в самом начале процедуры",
+    "effort": "5min",
+    "debt": "5min",
+    "author": "",
+    "tags": [
+      "badpractice",
+      "parameters",
+      "standard",
+      "unpredictable"
+    ],
+    "creationDate": "2026-10-17T09:40:19+0000",
+    "updateDate": "2026-10-17T09:40:19+0000",
+    "type": "BUG",
+    "scope": "MAIN",
+    "quickFixAvailable": false,
+    "messageFormattings": []
+  },
+  {
+    "key": "AaFJPrPPXCBQGdijV6sA",
+    "rule": "bsl-language-server:DataExchangeLoading",
+    "severity": "CRITICAL",
+    "component": "iikona:xml-dump/cfe/ИИКона/Catalogs/КИИ_ПодключенияКБазам/Ext/ObjectModule.bsl",
+    "project": "iikona",
+    "line": 11,
+    "hash": "85365f7b57d9df2ae119401cfd4d2965",
+    "textRange": {
+      "startLine": 11,
+      "endLine": 11,
+      "startOffset": 10,
+      "endOffset": 24
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Добавьте проверку признака ОбменДанными.Загрузка в самом начале процедуры",
+    "effort": "5min",
+    "debt": "5min",
+    "author": "",
+    "tags": [
+      "badpractice",
+      "parameters",
+      "standard",
+      "unpredictable"
+    ],
+    "creationDate": "2026-10-17T09:40:19+0000",
+    "updateDate": "2026-10-17T09:40:19+0000",
+    "type": "BUG",
+    "scope": "MAIN",
+    "quickFixAvailable": false,
+    "messageFormattings": []
+  },
+  {
+    "key": "AaFJPrAfXCBQGdijV6rF",
+    "rule": "bsl-language-server:UsageWriteLogEvent",
+    "severity": "INFO",
+    "component": "iikona:xml-dump/cfe/ИИКона/CommonModules/КИИ_СерверMCPИнструментИнфоКонфигурации/Ext/Module.bsl",
+    "project": "iikona",
+    "line": 169,
+    "hash": "e8c72479452578bf23d89382d7edb85f",
+    "textRange": {
+      "startLine": 169,
+      "endLine": 172,
+      "startOffset": 2,
+      "endOffset": 70
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Нужно указывать уровень \"Ошибка\" при записи в журнал регистрации внутри блока Исключение-КонецПопытки",
+    "effort": "1min",
+    "debt": "1min",
+    "author": "",
+    "tags": [
+      "badpractice",
+      "standard"
+    ],
+    "creationDate": "2026-10-17T09:40:19+0000",
+    "updateDate": "2026-10-17T09:40:19+0000",
+    "type": "CODE_SMELL",
+    "scope": "MAIN",
+    "quickFixAvailable": false,
+    "messageFormattings": []
+  },
+  {
+    "key": "AaE_3oHBXCBQGdijVbLQ",
+    "rule": "bsl-language-server:NumberOfOptionalParams",
+    "severity": "MINOR",
+    "component": "iikona:xml-dump/cfe/ИИКона/CommonModules/КИИ_RAG/Ext/Module.bsl",
+    "project": "iikona",
+    "line": 938,
+    "hash": "bff528cbce938d96698923eb77df63e7",
+    "textRange": {
+      "startLine": 938,
+      "endLine": 941,
+      "startOffset": 1,
+      "endOffset": 33
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Уменьшите количество необязательных параметров c 4 до допустимого 3",
+    "effort": "30min",
+    "debt": "30min",
+    "author": "",
+    "tags": [
+      "brainoverload",
+      "parameters",
+      "standard"
+    ],
+    "creationDate": "2026-10-15T13:59:00+0000",
+    "updateDate": "2026-10-15T13:59:00+0000",
+    "type": "CODE_SMELL",
+    "scope": "MAIN",
+    "quickFixAvailable": false,
+    "messageFormattings": []
+  }
+]
