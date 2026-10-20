@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite id="0" name="ПраваНастроекМониторинга [Сервер]" classname="Тесты_КИИ_ПраваЖурнала" tests="7" errors="0" skipped="0" failures="0" timestamp="2026-10-20T21:27:16" time="0.229" package="Тесты" context="Сервер">
+		<testcase name="КонтекстПравНастроекМониторинга" classname="Тесты_КИИ_ПраваЖурнала.КонтекстПравНастроекМониторинга" time="0.012" context="Сервер"/>
+		<testcase name="ЧтениеНастроекTelegramОграниченоПравом" classname="Тесты_КИИ_ПраваЖурнала.ЧтениеНастроекTelegramОграниченоПравом" time="0.033" context="Сервер"/>
+		<testcase name="МиграцияСекретовTelegramОграниченаПравом" classname="Тесты_КИИ_ПраваЖурнала.МиграцияСекретовTelegramОграниченаПравом" time="0.007" context="Сервер"/>
+		<testcase name="ЗаписьТокенаTelegramОграниченаПравом" classname="Тесты_КИИ_ПраваЖурнала.ЗаписьТокенаTelegramОграниченаПравом" time="0.01" context="Сервер"/>
+		<testcase name="ЗаписьЧатаTelegramОграниченаПравом" classname="Тесты_КИИ_ПраваЖурнала.ЗаписьЧатаTelegramОграниченаПравом" time="0.012" context="Сервер"/>
+		<testcase name="СохранениеНастроекМониторингаАтомарноПоПравам" classname="Тесты_КИИ_ПраваЖурнала.СохранениеНастроекМониторингаАтомарноПоПравам" time="0.012" context="Сервер"/>
+		<testcase name="ПрямоеЧтениеСекретовTelegramНедоступно" classname="Тесты_КИИ_ПраваЖурнала.ПрямоеЧтениеСекретовTelegramНедоступно" time="0.004" context="Сервер"/>
+		<properties>
+			<property name="context" value="Сервер"/>
+		</properties>
+	</testsuite>
+	<properties>
+		<property name="Конфигурация" value="Демонстрационная конфигурация &quot;Библиотека стандартных подсистем&quot;, редакция 3.1"/>
+		<property name="ВерсияКонфигурации" value="3.1.11.392"/>
+		<property name="ВерсияПлатформы" value="8.3.27.1989"/>
+		<property name="ИнформационнаяСреда" value="DEV"/>
+		<property name="ТестовыйДвижок" value="YAXUNIT"/>
+		<property name="ВерсияТестовогоДвижка" value="25.12"/>
+		<property name="ВстроенныйЯзык" value="ru"/>
+		<property name="ОперационнаяСистемаКлиент" value="Windows"/>
+		<property name="АрхитектураКлиент" value="x86_64"/>
+		<property name="ОперационнаяСистемаСервер" value="Windows"/>
+		<property name="АрхитектураСервер" value="x86_64"/>
+		<property name="ФайловаяБаза" value="false"/>
+		<property name="ОбычноеПриложение" value="false"/>
+		<property name="ВебКлиент" value="false"/>
+		<property name="ТолстыйКлиент" value="true"/>
+		<property name="ВремяЗапуска" value="2026-10-20T21:27:15"/>
+		<property name="Расширения" value="    |ИИКона |1.8.2 |Нет |Нет |
+    |Тесты |1.8.2 |Нет |Нет |
+    |YAXUNIT |25.12 |Нет |Нет |"/>
+	</properties>
+</testsuites>

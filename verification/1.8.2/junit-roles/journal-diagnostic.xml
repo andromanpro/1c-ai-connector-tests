@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite id="0" name="ЖурналИИПрава [Сервер]" classname="Тесты_КИИ_ПраваЖурнала" tests="13" errors="0" skipped="0" failures="0" timestamp="2026-10-20T21:16:29" time="0.505" package="Тесты" context="Сервер">
+		<testcase name="КонтекстОграниченногоПользователя" classname="Тесты_КИИ_ПраваЖурнала.КонтекстОграниченногоПользователя" time="0.012" context="Сервер"/>
+		<testcase name="ЧтениеСвоейЗаписи" classname="Тесты_КИИ_ПраваЖурнала.ЧтениеСвоейЗаписи" time="0.011" context="Сервер"/>
+		<testcase name="ЧтениеЧужойИИсторическойЗаписи" classname="Тесты_КИИ_ПраваЖурнала.ЧтениеЧужойИИсторическойЗаписи" time="0.004" context="Сервер"/>
+		<testcase name="ИзменениеСвоейЗаписи" classname="Тесты_КИИ_ПраваЖурнала.ИзменениеСвоейЗаписи" time="0.029" context="Сервер"/>
+		<testcase name="УдалениеСвоейЗаписи" classname="Тесты_КИИ_ПраваЖурнала.УдалениеСвоейЗаписи" time="0.009" context="Сервер"/>
+		<testcase name="ИзменениеЧужойЗаписиЗапрещено" classname="Тесты_КИИ_ПраваЖурнала.ИзменениеЧужойЗаписиЗапрещено" time="0.009" context="Сервер"/>
+		<testcase name="УдалениеЧужойЗаписиЗапрещено" classname="Тесты_КИИ_ПраваЖурнала.УдалениеЧужойЗаписиЗапрещено" time="0.01" context="Сервер"/>
+		<testcase name="СозданиеЧужойЗаписиЗапрещено" classname="Тесты_КИИ_ПраваЖурнала.СозданиеЧужойЗаписиЗапрещено" time="0.012" context="Сервер"/>
+		<testcase name="ПодменаВладельцаСвоейЗаписиЗапрещена" classname="Тесты_КИИ_ПраваЖурнала.ПодменаВладельцаСвоейЗаписиЗапрещена" time="0.01" context="Сервер"/>
+		<testcase name="ПодменаВладельцаПараметраЗапрещена" classname="Тесты_КИИ_ПраваЖурнала.ПодменаВладельцаПараметраЗапрещена" time="0.002" context="Сервер"/>
+		<testcase name="ПраваМетодовHTTPСоответствуютПрофилю" classname="Тесты_КИИ_ПраваЖурнала.ПраваМетодовHTTPСоответствуютПрофилю" time="0.003" context="Сервер"/>
+		<testcase name="АутентификацияMCPВПрофиле" classname="Тесты_КИИ_ПраваЖурнала.АутентификацияMCPВПрофиле" time="0.034" context="Сервер"/>
+		<testcase name="ОбычныйВызовМоделиЗаписываетВладельца" classname="Тесты_КИИ_ПраваЖурнала.ОбычныйВызовМоделиЗаписываетВладельца" time="0.093" context="Сервер"/>
+		<properties>
+			<property name="context" value="Сервер"/>
+		</properties>
+	</testsuite>
+	<properties>
+		<property name="Конфигурация" value="Демонстрационная конфигурация &quot;Библиотека стандартных подсистем&quot;, редакция 3.1"/>
+		<property name="ВерсияКонфигурации" value="3.1.11.392"/>
+		<property name="ВерсияПлатформы" value="8.3.27.1989"/>
+		<property name="ИнформационнаяСреда" value="DEV"/>
+		<property name="ТестовыйДвижок" value="YAXUNIT"/>
+		<property name="ВерсияТестовогоДвижка" value="25.12"/>
+		<property name="ВстроенныйЯзык" value="ru"/>
+		<property name="ОперационнаяСистемаКлиент" value="Windows"/>
+		<property name="АрхитектураКлиент" value="x86_64"/>
+		<property name="ОперационнаяСистемаСервер" value="Windows"/>
+		<property name="АрхитектураСервер" value="x86_64"/>
+		<property name="ФайловаяБаза" value="false"/>
+		<property name="ОбычноеПриложение" value="false"/>
+		<property name="ВебКлиент" value="false"/>
+		<property name="ТолстыйКлиент" value="true"/>
+		<property name="ВремяЗапуска" value="2026-10-20T21:16:28"/>
+		<property name="Расширения" value="    |ИИКона |1.8.2 |Нет |Нет |
+    |Тесты |1.8.2 |Нет |Нет |
+    |YAXUNIT |25.12 |Нет |Нет |"/>
+	</properties>
+</testsuites>

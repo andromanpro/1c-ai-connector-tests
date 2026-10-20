@@ -1,0 +1,18 @@
+{
+  "run_id": "20261020T181645Z-d96a8f07d661",
+  "source_hash": "67e17698cc129e2c8ab6e07ec5c53d34f43a52042aeb602c03d442c040f32a5f",
+  "original_controller_exit_code": 1,
+  "reason": "Immediate post-client guard rejected a session; subsequent unchanged strict guard accepted empty stand",
+  "guard_weakened": false,
+  "session_exception_added": false,
+  "wait": {
+    "elapsed_s": 71.5,
+    "strict_guard": {
+      "target": "server:localhost/iikona_perf_20261011",
+      "connected_sessions": 0,
+      "evidenced_disconnected_sessions": []
+    }
+  },
+  "controller_sha256": "d167ccecd1336443d7108e3062e8a3a278493a85bf152c4fb552e79dff5f1065",
+  "actual_junit_passed": true
+}

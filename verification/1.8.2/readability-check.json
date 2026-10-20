@@ -1,0 +1,9 @@
+{
+  "run_id": "20261020T174842Z-b4a71c53f98b",
+  "source_hash": "67e17698cc129e2c8ab6e07ec5c53d34f43a52042aeb602c03d442c040f32a5f",
+  "passed": true,
+  "files": 125,
+  "issues": 0,
+  "report": "F:\\temp\\iikona-audit-20261013\\runs\\20261020T174842Z-b4a71c53f98b\\readability-report.json",
+  "report_sha256": "a7de5e797d3cbd6b0ef85f271e10165acb13c11e34c5721dcca48796695e875a"
+}

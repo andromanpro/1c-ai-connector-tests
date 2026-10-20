@@ -1,0 +1,18 @@
+{
+  "run_id": "20261020T182159Z-8fa414cb921b",
+  "source_hash": "67e17698cc129e2c8ab6e07ec5c53d34f43a52042aeb602c03d442c040f32a5f",
+  "original_controller_exit_code": 1,
+  "reason": "Platform background job can outlive the managed test client",
+  "guard_weakened": false,
+  "session_exception_added": false,
+  "wait": {
+    "elapsed_s": 83.9,
+    "strict_guard": {
+      "target": "server:localhost/iikona_perf_20261011",
+      "connected_sessions": 0,
+      "evidenced_disconnected_sessions": []
+    }
+  },
+  "controller_sha256": "67b60ab4f4a15bbebfab32cde21dca9cb1b1ff742b8e39cafdb23f6539a644b5",
+  "actual_junit_passed": true
+}
