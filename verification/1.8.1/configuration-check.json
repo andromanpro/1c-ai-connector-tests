@@ -1,0 +1,24 @@
+{
+  "run_id": "20261020T070732Z-cc03402a00bc",
+  "source_hash": "f13db4edf690e3bcb07cb14c06071500ec90276b27c0316db9feeb0782ddee29",
+  "started": "2026-10-20T07:10:11.091285+00:00",
+  "extension": "ИИКона",
+  "flags": [
+    "-ThinClient",
+    "-WebClient",
+    "-Server",
+    "-ExternalConnection",
+    "-ExternalConnectionServer",
+    "-ThickClientManagedApplication",
+    "-ThickClientServerManagedApplication",
+    "-ConfigLogIntegrity",
+    "-IncorrectReferences",
+    "-HandlersExistence"
+  ],
+  "pid": 2192,
+  "passed": true,
+  "exit_code": 0,
+  "log_exists": true,
+  "diagnostic_count": 0,
+  "finished": "2026-10-20T07:10:25.113842+00:00"
+}

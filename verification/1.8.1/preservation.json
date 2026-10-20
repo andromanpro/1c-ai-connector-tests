@@ -1,0 +1,204 @@
+{
+  "passed_for_application_data": true,
+  "capture_exit_code": 1,
+  "reused_completed_capture": false,
+  "capture_sha256": "5334e947ae9c91c40aadbb5f61d2e06c5b57ab90ea69738ea0674c5fe263c4dd",
+  "strict_old_serialization_passed": false,
+  "exact_to_predeployment": true,
+  "different_sections_to_predeployment": {
+    "data": [],
+    "constants": [],
+    "users": [],
+    "catalog_ids": [],
+    "model_keys": []
+  },
+  "model_fields": [
+    {
+      "field": "Ссылка",
+      "equal_to_predeployment": true,
+      "current_sha256": "a494b6360da92c82ccfd5d98d04ad55ee5cd1e5a1147df301dfdf424e4471bc6"
+    },
+    {
+      "field": "ВерсияДанных",
+      "equal_to_predeployment": true,
+      "current_sha256": "ab25f80e88fc0e862f131bd85320076a152f684dbf59190aaa3e86e0fbcb1093"
+    },
+    {
+      "field": "ПометкаУдаления",
+      "equal_to_predeployment": true,
+      "current_sha256": "6f691c4ec0bae864522ee58e3d1fb691feeb5a952b89315d12ff5657a5af2364"
+    },
+    {
+      "field": "Код",
+      "equal_to_predeployment": true,
+      "current_sha256": "a30596d18ee5811bd054ee8bc46e3efa1ade20e8311d5850232d72de4c65ec27"
+    },
+    {
+      "field": "Наименование",
+      "equal_to_predeployment": true,
+      "current_sha256": "19b8db2b14ab6ab116043cf5c583463b19ab2bc085be40f3ee87b95e7eb0bb87"
+    },
+    {
+      "field": "Адрес",
+      "equal_to_predeployment": true,
+      "current_sha256": "881eefb0f3371ee183fdf470fd9e641d2d608e5cb90da7e6d1b4026d6ac1dab1"
+    },
+    {
+      "field": "АдресЗапроса",
+      "equal_to_predeployment": true,
+      "current_sha256": "133bc25ae8d28cb69eedc2e72dd87b566160af4803b1b26ad9ce6cfa0d5451c1"
+    },
+    {
+      "field": "ИмяПоляТекста",
+      "equal_to_predeployment": true,
+      "current_sha256": "a4e0b8220a030a99ded536787ae36b85a067b5509f75b74cf5c8ef6f1c78115f"
+    },
+    {
+      "field": "ИспользоватьЗащищенноеСоединение",
+      "equal_to_predeployment": true,
+      "current_sha256": "2ba43d83e3e1c28fe59bea2c1e10478596fa957e1bb56716eada71450ba2f39a"
+    },
+    {
+      "field": "МаксимумТокенов",
+      "equal_to_predeployment": true,
+      "current_sha256": "01c9b6cb34369c953b8670f99e39aa736d1fba73b60222ed232dd8a7e233a7f6"
+    },
+    {
+      "field": "НаименованиеПолное",
+      "equal_to_predeployment": true,
+      "current_sha256": "15bfd96e0b523d569fef0b837cb578c67e08f64e135d7316c544680eb1b015c2"
+    },
+    {
+      "field": "НаименованиеПровайдера",
+      "equal_to_predeployment": true,
+      "current_sha256": "74de98138d4892806634541e045756f84fe06544d82d6614510189d53dbfc90e"
+    },
+    {
+      "field": "Описание",
+      "equal_to_predeployment": true,
+      "current_sha256": "7db8dc469975d7eae37ec3129c698e748d6b6184a95f5620c9f7373e47f1ecbd"
+    },
+    {
+      "field": "Таймаут",
+      "equal_to_predeployment": true,
+      "current_sha256": "e4dc7eb0b8f77e275cfe059fcc7deb0287eecacb913d6b7522799bc774cb063e"
+    },
+    {
+      "field": "Температура",
+      "equal_to_predeployment": true,
+      "current_sha256": "91f7c35d8b965f96600854b18d434aee42df128c0ea5b1cfb7e5f842c5eee48c"
+    },
+    {
+      "field": "ТипАвторизации",
+      "equal_to_predeployment": true,
+      "current_sha256": "7c523811a6f4c6b0bb8a89e9b4bf607a57fc1e84e4503a813c3f21066e06bebb"
+    },
+    {
+      "field": "ТипФорматаAPI",
+      "equal_to_predeployment": true,
+      "current_sha256": "fcdb1c45aa6fb78f1e82c171cb155bc6ce5ea2c4e60220f94d8523b71b4ab852"
+    },
+    {
+      "field": "СрокЖизниКеша",
+      "equal_to_predeployment": true,
+      "current_sha256": "3b01b18c76fdd0a1334b764d79d142721d3578a460c888649fa257c2ab4989e4"
+    },
+    {
+      "field": "ВерсияСхемыКеша",
+      "equal_to_predeployment": true,
+      "current_sha256": "5b47682caa6a2c51daa81f363f515c162360d6e44ae42aa4c348cc7d9a1f44f9"
+    },
+    {
+      "field": "ТипМодели",
+      "equal_to_predeployment": true,
+      "current_sha256": "fc0302457e085c3af81ed0ec709e29ce4e2810160f0ea3b058225e5b05339e21"
+    },
+    {
+      "field": "EndpointЭмбеддингов",
+      "equal_to_predeployment": true,
+      "current_sha256": "74de98138d4892806634541e045756f84fe06544d82d6614510189d53dbfc90e"
+    },
+    {
+      "field": "РазмерностьЭмбеддинга",
+      "equal_to_predeployment": true,
+      "current_sha256": "4a8003a3ddbbc469ecd1d83ad647985ace1e82887f81bf0d7f1ae311d8365ac4"
+    },
+    {
+      "field": "МаксТокеновВхода",
+      "equal_to_predeployment": true,
+      "current_sha256": "4a8003a3ddbbc469ecd1d83ad647985ace1e82887f81bf0d7f1ae311d8365ac4"
+    },
+    {
+      "field": "КлассEgress",
+      "equal_to_predeployment": true,
+      "current_sha256": "a8b1f192d6b8355c31e1ab954d2960d7a041bc8d8de26f677257abb460b49c37"
+    },
+    {
+      "field": "ИспользоватьПрокси",
+      "equal_to_predeployment": true,
+      "current_sha256": "2ba43d83e3e1c28fe59bea2c1e10478596fa957e1bb56716eada71450ba2f39a"
+    },
+    {
+      "field": "ПоддерживаетИнструменты",
+      "equal_to_predeployment": true,
+      "current_sha256": "2ba43d83e3e1c28fe59bea2c1e10478596fa957e1bb56716eada71450ba2f39a"
+    },
+    {
+      "field": "РежимКонтроляПерсональныхДанных",
+      "equal_to_predeployment": true,
+      "current_sha256": "84d6ec4cc129759ea5f1def6499f134657217e2d5c91e709935233ff6242c691"
+    },
+    {
+      "field": "МаршрутДоверенный",
+      "equal_to_predeployment": true,
+      "current_sha256": "6f691c4ec0bae864522ee58e3d1fb691feeb5a952b89315d12ff5657a5af2364"
+    },
+    {
+      "field": "ОтпечатокДоверенногоМаршрута",
+      "equal_to_predeployment": true,
+      "current_sha256": "74de98138d4892806634541e045756f84fe06544d82d6614510189d53dbfc90e"
+    },
+    {
+      "field": "НастроитьНаборИнструментов",
+      "equal_to_predeployment": true,
+      "current_sha256": "6f691c4ec0bae864522ee58e3d1fb691feeb5a952b89315d12ff5657a5af2364"
+    },
+    {
+      "field": "Заголовки",
+      "equal_to_predeployment": true,
+      "current_sha256": "2347492fcd7e5cd766e54988f28c3d1674137be2fa9544a1670f29a6e7354d21"
+    },
+    {
+      "field": "Инструменты",
+      "equal_to_predeployment": true,
+      "current_sha256": "702897712c41ec8280521d11cebb98938424d13d0803574a73fda32363b913e6"
+    },
+    {
+      "field": "Предопределенный",
+      "equal_to_predeployment": true,
+      "current_sha256": "6f691c4ec0bae864522ee58e3d1fb691feeb5a952b89315d12ff5657a5af2364"
+    },
+    {
+      "field": "ИмяПредопределенныхДанных",
+      "equal_to_predeployment": true,
+      "current_sha256": "74de98138d4892806634541e045756f84fe06544d82d6614510189d53dbfc90e"
+    }
+  ],
+  "new_fields_default": {
+    "МаксимумРаундовПетли": true,
+    "МаксимумВызововПетли": true,
+    "МаксимумСимволовРезультатаПетли": true,
+    "МаксимумСимволовДиалогаПетли": true,
+    "РассчитыватьСтоимость": true,
+    "ВалютаТарифов": true,
+    "ТарифВходныхТокенов": true,
+    "ТарифВыходныхТокенов": true,
+    "ТарифЧтенияКеша": true,
+    "ТарифЗаписиКеша": true
+  },
+  "yaxunit_cfe_equal_to_previous_run": true,
+  "row_version_difference_observed_before_deployment": true,
+  "row_version_changed_since_predeployment": false,
+  "row_version_cause": "not established",
+  "no_data_restored_or_modified": true
+}

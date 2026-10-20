@@ -8,6 +8,25 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from verification_receipt import Receipt, require, digest, exported_tree, tree_hash, compare_files
+from bsl_readability_check import check_paths
+
+
+def verify_readability(receipt, projects):
+    """Проверить собственные модули до запуска EDT и обновления базы."""
+    paths = []
+    for item in projects.values():
+        source = Path(item['snapshot']) / 'src'
+        for module in source.rglob('*.bsl'):
+            relative = module.relative_to(source)
+            if len(relative.parts) > 1 and relative.parts[1].startswith(('КИИ_', 'Тесты_')):
+                paths.append(module)
+    report = check_paths(paths)
+    destination = receipt.folder / 'readability-report.json'
+    destination.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+    receipt.record('readability-check', {'passed': report['issues'] == 0, 'files': len(paths),
+                   'issues': report['issues'], 'report': str(destination),
+                   'report_sha256': digest(destination.read_bytes())})
+    require(report['issues'] == 0, 'BSL readability rules failed before EDT export: ' + str(destination))
 
 
 def xml_module_path(relative):
@@ -50,6 +69,7 @@ def export(receipt, projects, edt_cli):
             commands.append(f'export --project "{snapshot.as_posix()}" --configuration-files "{xml.as_posix()}"')
             proof[extension] = {'snapshot': str(snapshot), 'xml': str(xml),
                                 'project_description_sha256': digest((snapshot / '.project').read_bytes())}
+    verify_readability(receipt, proof)
     command_file = out / 'commands.txt'
     command_file.write_text('\n'.join(commands) + '\n', encoding='utf-8')
     with (out / 'cli.log').open('xb') as log:

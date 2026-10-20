@@ -97,6 +97,26 @@ def local_model_fixture():
             result={'id':'synthetic-request','object':'chat.completion','model':'legacy-fixture',
                     'choices':[{'message':{'role':'assistant','content':'Совместимость подтверждена'},'finish_reason':'stop'}],
                     'usage':{'prompt_tokens':7,'completion_tokens':3,'total_tokens':10,'cost':0.001}}
+            if scenario.startswith('exam-'):
+                def identifiers(value):
+                    if isinstance(value,dict):
+                        for child in value.values():yield from identifiers(child)
+                    elif isinstance(value,list):
+                        for child in value:yield from identifiers(child)
+                    elif isinstance(value,str):
+                        try:decoded=json.loads(value)
+                        except (ValueError,TypeError):return
+                        if isinstance(decoded,dict) and isinstance(decoded.get('requestId'),str):
+                            yield decoded['requestId']
+                found=list(identifiers(payload))
+                if len(found)!=1 or scenario not in {'exam-openai','exam-anthropic','exam-google','exam-yandex'}:
+                    code=400;result={'error':{'message':'Synthetic assessment requestId missing or ambiguous'}}
+                else:
+                    answer=json.dumps({'requestId':found[0],'verdict':'верно','score':1,'feedback':'По критериям.'},ensure_ascii=False)
+                    result['choices'][0]['message']['content']=answer
+                    if scenario=='exam-anthropic':result={'id':'synthetic-request','model':'legacy-fixture','content':[{'type':'text','text':answer}],'stop_reason':'end_turn','usage':{'input_tokens':7,'output_tokens':3}}
+                    if scenario=='exam-google':result={'candidates':[{'content':{'parts':[{'text':answer}]},'finishReason':'STOP'}],'usageMetadata':{'promptTokenCount':7,'candidatesTokenCount':3,'totalTokenCount':10}}
+                    if scenario=='exam-yandex':result={'result':{'alternatives':[{'message':{'role':'assistant','text':answer},'status':'ALTERNATIVE_STATUS_FINAL'}],'usage':{'inputTextTokens':'7','completionTokens':'3','totalTokens':'10'},'modelVersion':'legacy-fixture'}}
             if scenario=='anthropic':result={'id':'synthetic-request','model':'legacy-fixture','content':[{'type':'text','text':'Совместимость подтверждена'}],'stop_reason':'end_turn','usage':{'input_tokens':7,'output_tokens':3}}
             if scenario=='google':result={'candidates':[{'content':{'parts':[{'text':'Совместимость подтверждена'}]},'finishReason':'STOP'}],'usageMetadata':{'promptTokenCount':7,'candidatesTokenCount':3,'totalTokenCount':10}}
             if scenario=='yandex':result={'result':{'alternatives':[{'message':{'role':'assistant','text':'Совместимость подтверждена'},'status':'ALTERNATIVE_STATUS_FINAL'}],'usage':{'inputTextTokens':'7','completionTokens':'3','totalTokens':'10'},'modelVersion':'legacy-fixture'}}

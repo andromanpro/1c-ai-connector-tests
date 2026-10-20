@@ -1,0 +1,12 @@
+{
+  "before_source_hash": "a4e79ab1753fe2b9d3651da0687d418b08c7bb530873d6906bf746091cb62f5e",
+  "after_source_hash": "f13db4edf690e3bcb07cb14c06071500ec90276b27c0316db9feeb0782ddee29",
+  "changed": [
+    "product/Catalogs/КИИ_МоделиИИ/Forms/ФормаЭлемента/Form.form",
+    "product/Configuration/Configuration.mdo",
+    "tests/Configuration/Configuration.mdo"
+  ],
+  "added": [],
+  "removed": [],
+  "bsl_changed": false
+}
