@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "modules": {
+    "CommonModules/КИИ_КоннекторИИ/Module.bsl": {
+      "previous_exports": 34,
+      "preserved": true,
+      "added": [
+        "СохранитьЛичныйКодПодписки",
+        "УдалитьЛичныйКодПодписки"
+      ]
+    },
+    "Catalogs/КИИ_МоделиИИ/Forms/ФормаЭлемента/Module.bsl": {
+      "previous_exports": 2,
+      "preserved": true,
+      "added": []
+    }
+  }
+}

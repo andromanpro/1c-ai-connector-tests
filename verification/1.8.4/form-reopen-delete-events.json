@@ -1,0 +1,52 @@
+[
+  {
+    "action": "close_window",
+    "name": null,
+    "result": {
+      "ok": true,
+      "closed": "SecondaryFrame[3e111c92-4c09-4bac-b0df-09728d1b2b87]",
+      "connection_id": "c88a69e42385a4a00"
+    }
+  },
+  {
+    "action": "execute_command",
+    "name": null,
+    "result": {
+      "ok": true,
+      "command": "e1cib/data/Справочник.КИИ_МоделиИИ?ref=96d0fb27e2de1a23468dd5a1661049d0",
+      "window": {
+        "ok": true,
+        "key": "SecondaryFrame[ae3444c4-e60c-4239-8529-d3c819bfae42]",
+        "class": "SecondaryFrame",
+        "title": "K09_bsp_7df3e61441_personal_form (Модель ИИ)",
+        "addressable": true,
+        "url": "e1cib/data/Справочник.КИИ_МоделиИИ?ref=96d0fb27e2de1a23468dd5a1661049d0",
+        "home_page": false,
+        "is_main": false,
+        "form_name": "Справочник.КИИ_МоделиИИ.Форма.ФормаЭлемента"
+      },
+      "connection_id": "c88a69e42385a4a00"
+    }
+  },
+  {
+    "action": "activate",
+    "name": "СтраницаАвторизация",
+    "result": {
+      "ok": true,
+      "target": "SecondaryFrame[ae3444c4-e60c-4239-8529-d3c819bfae42].ManagedForm[24d192f0-851e-4a4a-a79e-8d03a7b856c9].Group[Вкладки].Group[СтраницаАвторизация]",
+      "action": "activate",
+      "target_check": "present",
+      "visible": true,
+      "connection_id": "c88a69e42385a4a00"
+    }
+  },
+  {
+    "action": "get_text",
+    "name": "КлючAPI",
+    "result": {
+      "ok": true,
+      "text": "",
+      "connection_id": "c88a69e42385a4a00"
+    }
+  }
+]

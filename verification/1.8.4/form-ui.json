@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "cleanup_complete": true,
+  "source_hash": "54a31809dc1d49aa1486ade294ceddf54a4a20b1cb97f5bac40760848b2fc880",
+  "ordinary_bsp_user": true,
+  "saved_in_ui_and_independent_storage_read": true,
+  "field_empty_after_save_and_reopen": true,
+  "deleted_in_ui_and_independent_storage_read": true,
+  "shared_model_unchanged": true,
+  "capture": "authorization.png",
+  "visual_checked": true,
+  "input_desktop_switched": false
+}

@@ -1,0 +1,61 @@
+[
+  {
+    "action": "activate",
+    "name": "СтраницаАвторизация",
+    "result": {
+      "ok": true,
+      "target": "SecondaryFrame[3e111c92-4c09-4bac-b0df-09728d1b2b87].ManagedForm[7556fd03-774f-4678-9999-4ab849d76ac3].Group[Вкладки].Group[СтраницаАвторизация]",
+      "action": "activate",
+      "target_check": "present",
+      "visible": true,
+      "connection_id": "c6bef2c918e64441c"
+    }
+  },
+  {
+    "action": "get_text",
+    "name": "КлючAPI",
+    "result": {
+      "ok": true,
+      "text": "",
+      "connection_id": "c6bef2c918e64441c"
+    }
+  },
+  {
+    "action": "click",
+    "name": "ФормаУдалитьЛичноеПодключение",
+    "result": {
+      "ok": true,
+      "target": "SecondaryFrame[3e111c92-4c09-4bac-b0df-09728d1b2b87].ManagedForm[7556fd03-774f-4678-9999-4ab849d76ac3].Group[ФормаКоманднаяПанель].Button[ФормаУдалитьЛичноеПодключение]",
+      "window": {
+        "ok": true,
+        "key": "SecondaryFrame[3e111c92-4c09-4bac-b0df-09728d1b2b87]",
+        "class": "SecondaryFrame",
+        "title": "K09_bsp_7df3e61441_personal_form (Модель ИИ)",
+        "addressable": true,
+        "url": "e1cib/data/Справочник.КИИ_МоделиИИ?ref=96d0fb27e2de1a23468dd5a1661049d0",
+        "home_page": false,
+        "is_main": false
+      },
+      "target_check": "present",
+      "connection_id": "c6bef2c918e64441c"
+    }
+  },
+  {
+    "action": "get_text",
+    "name": "РезультатПроверки",
+    "result": {
+      "ok": true,
+      "text": "Личный код текущего пользователя удален. Подписка и общая модель сохранены.",
+      "connection_id": "c6bef2c918e64441c"
+    }
+  },
+  {
+    "action": "get_text",
+    "name": "КлючAPI",
+    "result": {
+      "ok": true,
+      "text": "",
+      "connection_id": "c6bef2c918e64441c"
+    }
+  }
+]

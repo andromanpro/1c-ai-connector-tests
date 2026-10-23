@@ -1,0 +1,73 @@
+[
+  {
+    "action": "activate",
+    "name": "СтраницаАвторизация",
+    "result": {
+      "ok": true,
+      "target": "SecondaryFrame[c5d06e1a-e85f-4ce0-900e-b565d6c69b9f].ManagedForm[f7e89bdf-59a8-4a7a-99ed-95cf0a60a3a9].Group[Вкладки].Group[СтраницаАвторизация]",
+      "action": "activate",
+      "target_check": "present",
+      "visible": true,
+      "connection_id": "c0bc93c809a5b4fb5"
+    }
+  },
+  {
+    "action": "input_text",
+    "name": "КлючAPI",
+    "result": {
+      "ok": true,
+      "target": "SecondaryFrame[c5d06e1a-e85f-4ce0-900e-b565d6c69b9f].ManagedForm[f7e89bdf-59a8-4a7a-99ed-95cf0a60a3a9].Group[Вкладки].Group[СтраницаАвторизация].EditField[КлючAPI]",
+      "text": "ui-form-sentinel-20261023",
+      "committed": true,
+      "input_status": "accepted",
+      "edit_finished": true,
+      "data_presentation": "ui-form-sentinel-20261023",
+      "target_check": "present",
+      "observed": {
+        "kind": "displayed_text"
+      },
+      "changed": true,
+      "value_before": "",
+      "value_after": "ui-form-sentinel-20261023",
+      "connection_id": "c0bc93c809a5b4fb5"
+    }
+  },
+  {
+    "action": "click",
+    "name": "ФормаСохранитьЛичноеПодключение",
+    "result": {
+      "ok": true,
+      "target": "SecondaryFrame[c5d06e1a-e85f-4ce0-900e-b565d6c69b9f].ManagedForm[f7e89bdf-59a8-4a7a-99ed-95cf0a60a3a9].Group[ФормаКоманднаяПанель].Button[ФормаСохранитьЛичноеПодключение]",
+      "window": {
+        "ok": true,
+        "key": "SecondaryFrame[c5d06e1a-e85f-4ce0-900e-b565d6c69b9f]",
+        "class": "SecondaryFrame",
+        "title": "K09_bsp_7df3e61441_personal_form (Модель ИИ)",
+        "addressable": true,
+        "url": "e1cib/data/Справочник.КИИ_МоделиИИ?ref=96d0fb27e2de1a23468dd5a1661049d0",
+        "home_page": false,
+        "is_main": false
+      },
+      "target_check": "present",
+      "connection_id": "c0bc93c809a5b4fb5"
+    }
+  },
+  {
+    "action": "get_text",
+    "name": "КлючAPI",
+    "result": {
+      "ok": true,
+      "text": "",
+      "connection_id": "c0bc93c809a5b4fb5"
+    }
+  },
+  {
+    "action": "get_text",
+    "name": "РезультатПроверки",
+    "result": {
+      "ok": true,
+      "text": "Личный код сохранен только для текущего пользователя. Подключение еще не проверено.",
+      "connection_id": "c0bc93c809a5b4fb5"
+    }
+  }
+]

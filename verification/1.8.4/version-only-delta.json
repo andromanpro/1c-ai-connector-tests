@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "previous_source_hash": "c46083d93a5b2685587e58e125b361e05d82b751e04c33a0b34c3b9e0d06c592",
+  "source_hash": "54a31809dc1d49aa1486ade294ceddf54a4a20b1cb97f5bac40760848b2fc880",
+  "changed": [
+    "product/Configuration/Configuration.mdo",
+    "tests/Configuration/Configuration.mdo"
+  ],
+  "bsl_forms_roles_and_other_metadata_exact": true
+}

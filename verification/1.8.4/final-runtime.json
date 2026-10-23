@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "source_hash": "54a31809dc1d49aa1486ade294ceddf54a4a20b1cb97f5bac40760848b2fc880",
+  "extensions": {
+    "ИИКона": {
+      "sha256": "f4d97db65181f79fa59b98ed4801d7fe6444ada3380980cfbece1b355a99fccb",
+      "version": "1.8.4",
+      "active": true,
+      "safe_mode": false
+    },
+    "Тесты": {
+      "sha256": "2047c7682d7a5cf9070f49f9b5b5b5c5f426b9b6080b411b2504b7b67de5879a",
+      "version": "1.8.4",
+      "active": true,
+      "safe_mode": false
+    }
+  },
+  "configuration": {
+    "name": "БиблиотекаСтандартныхПодсистемДемо",
+    "version": "3.1.11.392"
+  },
+  "live_configuration_answers_exact": true,
+  "sessions_after": {
+    "target": "server:localhost/iikona_perf_20261011",
+    "connected_sessions": 0,
+    "evidenced_disconnected_sessions": []
+  }
+}
