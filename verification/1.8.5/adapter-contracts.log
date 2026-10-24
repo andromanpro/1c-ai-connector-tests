@@ -1,0 +1,15 @@
+25 ordinary contracts (2 optional native checks skipped in discovery):
+.........................ss
+----------------------------------------------------------------------
+Ran 27 tests in 5.603s
+
+OK (skipped=2)
+
+Both native checks executed separately on the identical source:
+test_system_and_developer_instructions_reach_actual_request (__main__.GLMWireTests.test_system_and_developer_instructions_reach_actual_request) ... ok
+test_system_instruction_does_not_replace_conversation_history (__main__.GLMWireTests.test_system_instruction_does_not_replace_conversation_history) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.245s
+
+OK

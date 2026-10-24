@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "run_id": "20261024T185603Z-bb9d0f7b6b9c",
+  "build_run": "20261024T185603Z-bb9d0f7b6b9c",
+  "source_hash": "90aea6bda6ec610cdf22acb68d2d817fb3a34c321217c672619337a8a3fe17dd",
+  "product_version": "1.8.5",
+  "tests_version": "1.8.5",
+  "artifacts": {
+    "IIkona-1.8.5.cfe": {
+      "sha256": "c75cd22fc84ad4abf6b21e3ae7e6f3787df19f9416d1642750ec207c8fbe7176",
+      "bytes": 1908736
+    },
+    "IIkona-tests-1.8.5.cfe": {
+      "sha256": "3a47103e1bcd2bfa53be59baac867a7b7ed4762afa9860000b2f2fe31e4ca7f8",
+      "bytes": 244912
+    }
+  },
+  "main": {
+    "passed": 1015,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "contexts": {
+      "Сервер": 988,
+      "КлиентУправляемоеПриложение": 27
+    },
+    "junit_sha256": "8fba5a8784ecb05ba4c533e4ca734ec27ee5e8afeba7b38df85c2407cf14567a"
+  },
+  "targeted": {
+    "passed": 17,
+    "part_of_main": true,
+    "same_final_run": true
+  },
+  "native_compiler": {
+    "passed": true,
+    "contexts": 7,
+    "diagnostics": 0
+  },
+  "ordinary_roles": {
+    "actors": 2,
+    "executions": 4,
+    "passed": 4,
+    "cleanup_complete": true,
+    "source_hash": "90aea6bda6ec610cdf22acb68d2d817fb3a34c321217c672619337a8a3fe17dd",
+    "owner_sequence": [
+      "first",
+      "second",
+      "first"
+    ],
+    "changed_route_sent_requests": 0,
+    "shared_model_key_used": false
+  },
+  "adapter_source": {
+    "files": {
+      "accounts.py": "afd91f898bdeb311ad83a4da06bed024e1799cdfe20430f63a7bb615956c2906",
+      "configure_glm.py": "f9b135012f1e96495e32386b2ac0dc7df73d7f1dfc89e544993714a5448f403a",
+      "glm_client.py": "4e8cb862ff3dfb01e541f9ab4394cc97f84e78c62ff4e1020281262e02368878",
+      "manage.py": "a89b209a94697ae9c4e9fdfe0b07b02ea50976cbe69338b4dece53e9da782fd7",
+      "protocol.py": "076bb6fd323203208fe26fe272143e9f61a6de1eba4788201103451317631b87",
+      "requirements.txt": "afce9f76c28036a32a8f1dd9c2a1cd83486bf072975433a288f2bd157ea64d82",
+      "server.py": "9de7a0b91ca231e69bfb7eb7de8cce8f5307236b03cedc53c47043a7666eb0e0",
+      "test_adapter.py": "9d09f52d20f99aa8b9e927b07c8688b4cb0c80cbc4cd007ca75fa9b509cfb652",
+      "test_glm_wire.py": "bbcd95df7fa62c1861ee66cf50c60f492bc9d89250492269b1800d7cc5f4f6ca"
+    }
+  },
+  "adapter_contract_tests": {
+    "passed": 27,
+    "skipped": 0,
+    "native_wire_cases": 2,
+    "new_provider_inferences": 0,
+    "same_frozen_adapter": true
+  },
+  "preservation": {
+    "passed": true,
+    "tables": 24,
+    "rows": 526,
+    "users": 2,
+    "constants": 22,
+    "model_keys": 1,
+    "all_current_fields": true
+  },
+  "sonar": {
+    "analysis_id": "AaFvU6aiG1uCtqFpVRVo",
+    "gate": "OK",
+    "unresolved_issues": 0,
+    "hotspots_safe": 46,
+    "profile_rules_unchanged": true
+  },
+  "verification_limits": [
+    "DSML and HTTP503 were checked with controlled local HTTP servers, not Sergey's live provider.",
+    "Client assertions used real managed forms without opening a foreground window; not a complete web/thin-client matrix.",
+    "The 27 adapter checks include native wire tests without provider inference; no new live subscription generation was requested.",
+    "This patch release does not complete the planned full refactoring or certify all deployment configurations."
+  ]
+}

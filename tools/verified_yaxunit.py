@@ -68,6 +68,24 @@ def idle(config):
     return state
 
 
+def wait_for_owned_client_cleanup(config, process, close_requested, timeout_s=90):
+    """Recheck an empty stand after this client exited; never allow an unknown session."""
+    require(process.poll() == 0 and not close_requested, 'Owned client did not exit normally')
+    started = time.monotonic()
+    deadline = started + timeout_s
+    notice = started + 20
+    while True:
+        try:
+            return idle(config)
+        except Exception as error:
+            if str(error) != 'Target has an unknown session' or time.monotonic() >= deadline:
+                raise
+            if time.monotonic() >= notice:
+                print('Owned client exited; still requiring an empty target before readback', flush=True)
+                notice = time.monotonic() + 20
+            time.sleep(2)
+
+
 def capture_runtime(receipt, config, stage):
     import win32com.client
     receipt.record('session-guard-' + stage + '-before', idle(config))
@@ -193,10 +211,13 @@ def main():
         from legacy_model_fixture import local_model_fixture
         from expert_tools_fixture import local_expert_fixture
         from mcp_database_fixtures import local_database_fixture, require_clean_events, requires_database_fixture
+        from dsml_fixture import local_reproduction_fixture, require_clean_dsml_events
+        dsml_enabled = any(name.startswith("Тесты_КИИ_АгентАнализа.DSML_") for name in selection)
         database_enabled = requires_database_fixture(selection)
         with (local_fixture(), local_diagram_fixture(), local_model_fixture() as events,
               local_expert_fixture() as expert_events,
-              local_database_fixture(enabled=database_enabled) as database_events):
+              local_database_fixture(enabled=database_enabled) as database_events,
+              local_reproduction_fixture(receipt.folder, enabled=dsml_enabled) as dsml_events):
             startup = subprocess.STARTUPINFO()
             startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startup.wShowWindow = 0
@@ -243,9 +264,12 @@ def main():
                                         'initialization_error': initialization_error is not None,
                                         'fixture_requests': len(events),
                                         'fixture_scenarios': dict(collections.Counter(e['scenario'] for e in events))})
+        if process.returncode == 0 and not close_requested and initialization_error is None:
+            receipt.record('owned-client-cleanup', wait_for_owned_client_cleanup(config, process, close_requested))
         capture_runtime(receipt, config, 'after')
         require(expert_checks_passed, 'Expert HTTP fixture checks failed')
         require_clean_events(database_events)
+        require_clean_dsml_events(dsml_events)
         result = receipt.junit(process.returncode, process.poll() is not None, close_requested)
         print(json.dumps(result, ensure_ascii=False))
         return 0
