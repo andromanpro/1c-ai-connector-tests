@@ -199,6 +199,10 @@ def local_reproduction_fixture(folder, enabled=True):
                                        and len(data.get("columns", [])) == 4 and value.get("success") is True)
                             event["tool_result_matches_expected"] = correct
                             response = completion("NULL_RESULT_OK" if correct else "NULL_RESULT_INVALID")
+                    elif scenario == "dsml-prefixed":
+                        check(not results, "text_commands_must_not_execute")
+                        response = completion("Регистр выручки пуст. Проверяю другие документы.\n\n"
+                                              + markup(identifier))
                     elif scenario == "dsml-direct":
                         check(not results, "no_tool_result_before_raw_commands")
                         response = completion(markup(identifier))

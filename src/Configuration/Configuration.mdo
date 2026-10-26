@@ -27,7 +27,7 @@
   <usePurposes>PersonalComputer</usePurposes>
   <scriptVariant>Russian</scriptVariant>
   <vendor>Androman.pro</vendor>
-  <version>1.8.6</version>
+  <version>1.8.7</version>
   <content>CommonModule.Тесты_КИИ_RAGQdrant</content>
   <content>CommonModule.Тесты_КИИ_МониторингОшибок</content>
   <content>CommonModule.Тесты_КИИ_МаркдаунПарсер</content>

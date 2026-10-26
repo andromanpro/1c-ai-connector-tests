@@ -1,0 +1,38 @@
+test_denied_consent_leaves_existing_account_unchanged (test_adapter.IdentityTests.test_denied_consent_leaves_existing_account_unchanged) ... ok
+test_direct_permission_is_required (test_adapter.IdentityTests.test_direct_permission_is_required) ... ok
+test_dpapi_roundtrip_does_not_write_plaintext (test_adapter.IdentityTests.test_dpapi_roundtrip_does_not_write_plaintext) ... ok
+test_identity_checks_signature_audience_issuer_and_nonce (test_adapter.IdentityTests.test_identity_checks_signature_audience_issuer_and_nonce) ... ok
+test_state_mismatch_preserves_pending_login (test_adapter.IdentityTests.test_state_mismatch_preserves_pending_login) ... ok
+test_builtins_and_unsupported_content_are_rejected (test_adapter.ProtocolTests.test_builtins_and_unsupported_content_are_rejected) ... ok
+test_delta_without_completed_is_not_success (test_adapter.ProtocolTests.test_delta_without_completed_is_not_success) ... ok
+test_historical_call_and_result_keep_identifiers (test_adapter.ProtocolTests.test_historical_call_and_result_keep_identifiers) ... ok
+test_late_subscription_error_overrides_partial_text (test_adapter.ProtocolTests.test_late_subscription_error_overrides_partial_text) ... ok
+test_missing_or_foreign_tool_results_are_rejected (test_adapter.ProtocolTests.test_missing_or_foreign_tool_results_are_rejected) ... ok
+test_only_supplied_context_and_tools_are_sent (test_adapter.ProtocolTests.test_only_supplied_context_and_tools_are_sent) ... ok
+test_siwc_completed_items_are_read_when_terminal_output_is_empty (test_adapter.ProtocolTests.test_siwc_completed_items_are_read_when_terminal_output_is_empty) ... ok
+test_unoffered_tool_is_rejected (test_adapter.ProtocolTests.test_unoffered_tool_is_rejected) ... ok
+test_usage_and_unknown_cost_are_distinct (test_adapter.ProtocolTests.test_usage_and_unknown_cost_are_distinct) ... ok
+test_account_switch_cannot_replay_an_answer_or_tool_continuation (test_adapter.TransportTests.test_account_switch_cannot_replay_an_answer_or_tool_continuation) ... ok
+test_glm_model_catalog_does_not_require_a_chatgpt_account (test_adapter.TransportTests.test_glm_model_catalog_does_not_require_a_chatgpt_account) ... ok
+test_glm_reconfiguration_cannot_replay_an_old_answer (test_adapter.TransportTests.test_glm_reconfiguration_cannot_replay_an_old_answer) ... ok
+test_glm_uses_its_supported_client_without_chatgpt_authorization (test_adapter.TransportTests.test_glm_uses_its_supported_client_without_chatgpt_authorization) ... ok
+test_interrupted_request_is_not_resent (test_adapter.TransportTests.test_interrupted_request_is_not_resent) ... ok
+test_invalid_answer_is_preserved_before_content_validation (test_adapter.TransportTests.test_invalid_answer_is_preserved_before_content_validation) ... ok
+test_logout_cannot_replay_or_read_a_saved_answer (test_adapter.TransportTests.test_logout_cannot_replay_or_read_a_saved_answer) ... ok
+test_native_reasoning_is_restored_for_1c_tool_result (test_adapter.TransportTests.test_native_reasoning_is_restored_for_1c_tool_result) ... ok
+test_other_personal_connection_cannot_restore_a_tool (test_adapter.TransportTests.test_other_personal_connection_cannot_restore_a_tool) ... ok
+test_real_http_request_and_idempotent_result (test_adapter.TransportTests.test_real_http_request_and_idempotent_result) ... ok
+test_reuse_of_request_id_for_different_content_is_rejected (test_adapter.TransportTests.test_reuse_of_request_id_for_different_content_is_rejected) ... ok
+test_system_and_developer_instructions_reach_actual_request (test_glm_wire.GLMWireTests.test_system_and_developer_instructions_reach_actual_request) ... ok
+test_system_instruction_does_not_replace_conversation_history (test_glm_wire.GLMWireTests.test_system_instruction_does_not_replace_conversation_history) ... ok
+test_archive_preserves_replay_and_continuation_without_new_inference (test_receipt_maintenance.ReceiptMaintenance.test_archive_preserves_replay_and_continuation_without_new_inference) ... ok
+test_existing_archive_is_not_overwritten (test_receipt_maintenance.ReceiptMaintenance.test_existing_archive_is_not_overwritten) ... ok
+test_http_maintenance_requires_pairing_and_reviewed_plan (test_receipt_maintenance.ReceiptMaintenance.test_http_maintenance_requires_pairing_and_reviewed_plan) ... ok
+test_modified_evidence_invalidates_reviewed_plan (test_receipt_maintenance.ReceiptMaintenance.test_modified_evidence_invalidates_reviewed_plan) ... ok
+test_recent_or_incomplete_receipts_are_not_archived (test_receipt_maintenance.ReceiptMaintenance.test_recent_or_incomplete_receipts_are_not_archived) ... ok
+test_unknown_outcome_is_retained_even_when_old (test_receipt_maintenance.ReceiptMaintenance.test_unknown_outcome_is_retained_even_when_old) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 9.286s
+
+OK

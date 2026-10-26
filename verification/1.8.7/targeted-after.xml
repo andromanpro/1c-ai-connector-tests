@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite id="0" name="DSML [Сервер]" classname="Тесты_КИИ_АгентАнализа" tests="33" errors="0" skipped="0" failures="0" timestamp="2026-10-26T21:12:29" time="3.786" package="Тесты" context="Сервер">
+		<testcase name="DSML_ВызовыТекстомНеУспешныйАнализ" classname="Тесты_КИИ_АгентАнализа.DSML_ВызовыТекстомНеУспешныйАнализ" time="0.273" context="Сервер"/>
+		<testcase name="DSML_ПослеОтказаБазыНеУспешныйАнализ" classname="Тесты_КИИ_АгентАнализа.DSML_ПослеОтказаБазыНеУспешныйАнализ" time="0.169" context="Сервер"/>
+		<testcase name="DSML_ОтказБазыПонятныйОтвет" classname="Тесты_КИИ_АгентАнализа.DSML_ОтказБазыПонятныйОтвет" time="0.174" context="Сервер"/>
+		<testcase name="DSML_ОбычныйОтветНеМеняется" classname="Тесты_КИИ_АгентАнализа.DSML_ОбычныйОтветНеМеняется" time="0.05" context="Сервер"/>
+		<testcase name="DSML_ЦитатаФорматаНеИсполняется" classname="Тесты_КИИ_АгентАнализа.DSML_ЦитатаФорматаНеИсполняется" time="0.057" context="Сервер"/>
+		<testcase name="DSML_ПробелыПередКомандами" classname="Тесты_КИИ_АгентАнализа.DSML_ПробелыПередКомандами" time="0.055" context="Сервер"/>
+		<testcase name="DSML_НастоящиеВызовыПриоритетнееТекста" classname="Тесты_КИИ_АгентАнализа.DSML_НастоящиеВызовыПриоритетнееТекста" time="0.093" context="Сервер"/>
+		<testcase name="DSML_ОтказИсточникаНеЗависитОтМодели" classname="Тесты_КИИ_АгентАнализа.DSML_ОтказИсточникаНеЗависитОтМодели" time="0.174" context="Сервер"/>
+		<testcase name="DSML_ПовторОтказаБезДубляСообщения" classname="Тесты_КИИ_АгентАнализа.DSML_ПовторОтказаБезДубляСообщения" time="0.217" context="Сервер"/>
+		<testcase name="DSML_ЖурналФиксируетОшибкуПротокола" classname="Тесты_КИИ_АгентАнализа.DSML_ЖурналФиксируетОшибкуПротокола" time="0.131" context="Сервер"/>
+		<testcase name="DSML_ЦитатаВСтрокеНеМеняется" classname="Тесты_КИИ_АгентАнализа.DSML_ЦитатаВСтрокеНеМеняется" time="0.051" context="Сервер"/>
+		<testcase name="DSML_АудитУдвоенныеРазделители" classname="Тесты_КИИ_АгентАнализа.DSML_АудитУдвоенныеРазделители" time="0.003" context="Сервер"/>
+		<testcase name="DSML_ВступлениеПередРазметкой" classname="Тесты_КИИ_АгентАнализа.DSML_ВступлениеПередРазметкой" time="0.007" context="Сервер"/>
+		<testcase name="DSML_ПримерыРазметкиПослеВступления" classname="Тесты_КИИ_АгентАнализа.DSML_ПримерыРазметкиПослеВступления" time="0.006" context="Сервер"/>
+		<testcase name="DSML_ВступлениеВОтветеМодели" classname="Тесты_КИИ_АгентАнализа.DSML_ВступлениеВОтветеМодели" time="0.052" context="Сервер"/>
+		<testcase name="Базы_ОшибкаЛокальногоЗапросаНеОшибкаПодключения" classname="Тесты_КИИ_АгентАнализа.Базы_ОшибкаЛокальногоЗапросаНеОшибкаПодключения" time="0.015" context="Сервер"/>
+		<testcase name="Базы_ПричинаОшибкиИнструментаВЖурнале" classname="Тесты_КИИ_АгентАнализа.Базы_ПричинаОшибкиИнструментаВЖурнале" time="1.04" context="Сервер"/>
+		<testcase name="DSML_АудитОбычныйТекстИПримеры" classname="Тесты_КИИ_АгентАнализа.DSML_АудитОбычныйТекстИПримеры" time="0.004" context="Сервер"/>
+		<testcase name="DSML_АудитНеполныеОтветы" classname="Тесты_КИИ_АгентАнализа.DSML_АудитНеполныеОтветы" time="0.012" context="Сервер"/>
+		<testcase name="DSML_АудитПолныйОтвет" classname="Тесты_КИИ_АгентАнализа.DSML_АудитПолныйОтвет" time="0.001" context="Сервер"/>
+		<testcase name="DSML_АудитNullВЗапросе" classname="Тесты_КИИ_АгентАнализа.DSML_АудитNullВЗапросе" time="0.007" context="Сервер"/>
+		<testcase name="DSML_АудитNullВПетле" classname="Тесты_КИИ_АгентАнализа.DSML_АудитNullВПетле" time="0.096" context="Сервер"/>
+		<testcase name="DSML_АудитУдвоенныйDSMLВПетле" classname="Тесты_КИИ_АгентАнализа.DSML_АудитУдвоенныйDSMLВПетле" time="0.099" context="Сервер"/>
+		<testcase name="DSML_АудитНеполныйОтветВПетле" classname="Тесты_КИИ_АгентАнализа.DSML_АудитНеполныйОтветВПетле" time="0.051" context="Сервер"/>
+		<testcase name="DSML_АудитНеполныйОтветНеКешируется" classname="Тесты_КИИ_АгентАнализа.DSML_АудитНеполныйОтветНеКешируется" time="0.085" context="Сервер"/>
+		<testcase name="DSML_АудитПримитивыЗапроса" classname="Тесты_КИИ_АгентАнализа.DSML_АудитПримитивыЗапроса" time="0.003" context="Сервер"/>
+		<testcase name="DSML_БюджетЭкранирования" classname="Тесты_КИИ_АгентАнализа.DSML_БюджетЭкранирования" time="0.006" context="Сервер"/>
+		<testcase name="DSML_БюджетИсточника" classname="Тесты_КИИ_АгентАнализа.DSML_БюджетИсточника" time="0.003" context="Сервер"/>
+		<testcase name="DSML_БюджетПервогоЗапроса" classname="Тесты_КИИ_АгентАнализа.DSML_БюджетПервогоЗапроса" time="0.041" context="Сервер"/>
+		<testcase name="DSML_БюджетАргументовПетли" classname="Тесты_КИИ_АгентАнализа.DSML_БюджетАргументовПетли" time="0.053" context="Сервер"/>
+		<testcase name="DSML_БюджетФинальногоЗапроса" classname="Тесты_КИИ_АгентАнализа.DSML_БюджетФинальногоЗапроса" time="0.055" context="Сервер"/>
+		<testcase name="DSML_ФинальныйОбрывСохраняетТекст" classname="Тесты_КИИ_АгентАнализа.DSML_ФинальныйОбрывСохраняетТекст" time="0.077" context="Сервер"/>
+		<testcase name="DSML_НеподдерживаемыйТипНеМаскируется" classname="Тесты_КИИ_АгентАнализа.DSML_НеподдерживаемыйТипНеМаскируется" time="0.001" context="Сервер"/>
+		<properties>
+			<property name="context" value="Сервер"/>
+		</properties>
+	</testsuite>
+	<testsuite id="1" name="АгентАнализа [Сервер]" classname="Тесты_КИИ_АгентАнализа" tests="1" errors="0" skipped="0" failures="0" timestamp="2026-10-26T21:12:33" time="0.308" package="Тесты" context="Сервер">
+		<testcase name="DSML_СтруктураПетля" classname="Тесты_КИИ_АгентАнализа.DSML_СтруктураПетля" time="0.273" context="Сервер"/>
+		<properties>
+			<property name="context" value="Сервер"/>
+		</properties>
+	</testsuite>
+	<properties>
+		<property name="Конфигурация" value="Демонстрационная конфигурация &quot;Библиотека стандартных подсистем&quot;, редакция 3.1"/>
+		<property name="ВерсияКонфигурации" value="3.1.11.392"/>
+		<property name="ВерсияПлатформы" value="8.3.27.1989"/>
+		<property name="ИнформационнаяСреда" value="DEV"/>
+		<property name="ТестовыйДвижок" value="YAXUNIT"/>
+		<property name="ВерсияТестовогоДвижка" value="25.12"/>
+		<property name="ВстроенныйЯзык" value="ru"/>
+		<property name="ОперационнаяСистемаКлиент" value="Windows"/>
+		<property name="АрхитектураКлиент" value="x86_64"/>
+		<property name="ОперационнаяСистемаСервер" value="Windows"/>
+		<property name="АрхитектураСервер" value="x86_64"/>
+		<property name="ФайловаяБаза" value="false"/>
+		<property name="ОбычноеПриложение" value="false"/>
+		<property name="ВебКлиент" value="false"/>
+		<property name="ТолстыйКлиент" value="true"/>
+		<property name="ВремяЗапуска" value="2026-10-26T21:12:29"/>
+		<property name="Расширения" value="    |ИИКона |1.8.7 |Нет |Нет |
+    |Тесты |1.8.7 |Нет |Нет |
+    |YAXUNIT |25.12 |Нет |Нет |"/>
+	</properties>
+</testsuites>
