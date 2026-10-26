@@ -1,0 +1,32 @@
+{
+  "unique_scenarios": 8,
+  "profiles": 5,
+  "executions": 40,
+  "passed": 40,
+  "cleanup_complete": true,
+  "additional_product_roles": [],
+  "privileged_bypass": false,
+  "cases": {
+    "system_admin": {
+      "passed": 8,
+      "junit_sha256": "7307136a4f0137384a4332286e4074a3f8cb26edd5bcc52241a8da75bcfb94da"
+    },
+    "a": {
+      "passed": 8,
+      "junit_sha256": "4ff58fb320147dc7a2464293a614ad597f81252172011ecc2438725da39ca16b"
+    },
+    "b": {
+      "passed": 8,
+      "junit_sha256": "27efb4c093d4c05b96d7250d544e4d42eb8f424e7fa1f9ff1cb275d300ce8269"
+    },
+    "viewer": {
+      "passed": 8,
+      "junit_sha256": "504b510598b20f93c359c13b168752fac1c082689db0c6c34e1ef8ce40be68f9"
+    },
+    "diagnostic": {
+      "passed": 8,
+      "junit_sha256": "2d84136ff3b79f031d0dee5995a03afdff4a226e7fe9c8cc1b59af6142b199ec"
+    }
+  },
+  "source_hash": "0434daa4d1103053b287407a6965029a7ee6dfa2a6c4524614b4b72a764b4f33"
+}

@@ -108,15 +108,98 @@ def local_reproduction_fixture(folder, enabled=True):
                     catalogs = [json.loads(m["content"][len(PREFIX):].split("\n\n", 1)[0])
                                 for m in messages if m.get("role") == "system"
                                 and isinstance(m.get("content"), str) and m["content"].startswith(PREFIX)]
-                    check(len(catalogs) == 1 and len(catalogs[0]) == 1, "one_selected_database")
-                    database = catalogs[0][0]
-                    identifier = database["database_id"]
+                    if scenario != "dsml-audit-cache":
+                        check(len(catalogs) == 1 and len(catalogs[0]) == 1, "one_selected_database")
+                        database = catalogs[0][0]
+                        identifier = database["database_id"]
                     check("reader-a" not in json.dumps(body) and "123456" not in json.dumps(body),
                           "no_target_credentials_in_model_context")
-                    check("execute_query" in [t["function"]["name"] for t in body.get("tools", [])],
-                          "query_tool_was_advertised")
+                    finalization_without_tools = not body.get("tools") and (
+                        scenario == "dsml-audit-final-length" or scenario.startswith("dsml-budget-"))
+                    if scenario != "dsml-audit-cache" and not finalization_without_tools:
+                        check("execute_query" in [t["function"]["name"] for t in body.get("tools", [])],
+                              "query_tool_was_advertised")
                     results = [m for m in messages if m.get("role") == "tool"]
-                    if scenario == "dsml-direct":
+                    if scenario == "dsml-structure-pages":
+                        pages = [json.loads(result['content']) for result in results]
+                        missing_page = any(not isinstance(value.get('data'), dict)
+                                           or not value['data'].get('paged') for value in pages)
+                        event['structure_page_missing'] = missing_page
+                        if missing_page:
+                            response = completion(json.dumps({'paths': [], 'protocol_error': 'page_missing'}))
+                        else:
+                            paths = []
+                            offset = 0
+                            for result in results:
+                                envelope = json.loads(result['content'])
+                                check(envelope.get('database_id') == identifier and envelope.get('success') is True,
+                                      'structure_source_preserved')
+                                data = envelope.get('data', {})
+                                check(data.get('paged') is True and isinstance(data.get('items'), list), 'structure_page_received')
+                                check(data['offset'] == offset and data['returned_count'] == len(data['items']), 'structure_contiguous_page')
+                                check(len(result['content']) <= 2000, 'structure_wire_budget')
+                                check(bool(data['items']) or not data['has_more'], 'structure_makes_progress')
+                                paths.extend(item['path'] for item in data['items'])
+                                offset = data['next_offset']
+                                check(offset == len(paths) and len(set(paths)) == len(paths), 'structure_no_skips_or_duplicates')
+                            if results and not data['has_more']:
+                                check(len(paths) == data['total_count'], 'structure_complete')
+                                response = completion(json.dumps({'paths': paths}, ensure_ascii=False))
+                            else:
+                                arguments = {'database_id': identifier, 'object_type': 'Catalog', 'name': 'КИИ_МоделиИИ'}
+                                if results:
+                                    arguments['offset'] = offset
+                                response = completion(None, [{'id': 'structure-page-' + str(offset), 'type': 'function', 'function': {
+                                    'name': 'get_object_structure', 'arguments': json.dumps(arguments, ensure_ascii=False)}}])
+                    elif scenario == "dsml-audit-cache":
+                        prior = sum(e.get("scenario") == scenario and e.get("request", {}).get("model") == body["model"]
+                                    for e in events)
+                        response = completion("PARTIAL_CACHE_INPUT" if prior == 0 else "CACHE_RECOVERY_OK")
+                        if prior == 0:
+                            response["choices"][0]["finish_reason"] = "length"
+                    elif scenario.startswith("dsml-budget-"):
+                        event["messages_json_chars"] = len(json.dumps(messages, ensure_ascii=False, separators=(",", ":")))
+                        if scenario == "dsml-budget-args" and not results:
+                            arguments = {"database_id": identifier, "query_id": "budget-arguments",
+                                         "query_text": "ВЫБРАТЬ 1 КАК Значение // " + "x" * 6000, "limit": 1}
+                            response = completion(None, [{"id": "budget-arguments-call", "type": "function", "function": {
+                                "name": "execute_query", "arguments": json.dumps(arguments, ensure_ascii=False)}}])
+                        else:
+                            response = completion("OVER_BUDGET_REQUEST_WAS_SENT")
+                    elif scenario == "dsml-audit-final-length":
+                        if body.get("tools"):
+                            arguments = {"database_id": identifier, "query_id": "final-length", "query_text": "ВЫБРАТЬ 1 КАК Значение", "limit": 1}
+                            response = completion(None, [{"id": "final-length-call", "type": "function", "function": {
+                                "name": "execute_query", "arguments": json.dumps(arguments, ensure_ascii=False)}}])
+                        else:
+                            check(len(results) == 1 and results[0]["tool_call_id"] == "final-length-call", "finalization_keeps_call_result_pair")
+                            response = completion("PARTIAL_FINAL_FOR_DISPLAY")
+                            response["choices"][0]["finish_reason"] = "length"
+                    elif scenario == "dsml-audit-length":
+                        response = completion("PARTIAL_FOR_DISPLAY")
+                        response["choices"][0]["finish_reason"] = "length"
+                    elif scenario in ("dsml-audit-double-ascii", "dsml-audit-double-wide"):
+                        separator = "||" if scenario.endswith("ascii") else "｜｜"
+                        response = completion("<" + separator + "DSML" + separator + " calls>")
+                    elif scenario == "dsml-audit-null":
+                        if not results:
+                            arguments = {"database_id": identifier, "query_id": "audit-null-wire",
+                                         "query_text": 'ВЫБРАТЬ NULL КАК Пустое, 0 КАК Ноль, ЛОЖЬ КАК Булево, "" КАК ПустаяСтрока',
+                                         "limit": 1}
+                            response = completion(None, [{"id": "audit-null-call", "type": "function", "function": {
+                                "name": "execute_query", "arguments": json.dumps(arguments, ensure_ascii=False)}}])
+                        else:
+                            check(len(results) == 1 and results[0]["tool_call_id"] == "audit-null-call", "null_call_has_result")
+                            try:
+                                value = json.loads(results[0]["content"])
+                            except ValueError:
+                                value = None
+                            data = value.get("data") if isinstance(value, dict) else None
+                            correct = (isinstance(data, dict) and data.get("rows") == [[None, 0, False, ""]]
+                                       and len(data.get("columns", [])) == 4 and value.get("success") is True)
+                            event["tool_result_matches_expected"] = correct
+                            response = completion("NULL_RESULT_OK" if correct else "NULL_RESULT_INVALID")
+                    elif scenario == "dsml-direct":
                         check(not results, "no_tool_result_before_raw_commands")
                         response = completion(markup(identifier))
                     elif scenario == "dsml-leading-space":

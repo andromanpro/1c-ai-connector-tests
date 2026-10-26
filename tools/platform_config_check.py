@@ -29,7 +29,7 @@ def record_check(receipt, name, values):
                                  if key not in ('run_id', 'source_hash')})
 
 
-def check_configuration(receipt, config_path, evidence_dir=None):
+def check_configuration(receipt, config_path, evidence_dir=None, extension='ИИКона'):
     receipt.unchanged()
     require((receipt.folder/'build.json').exists(), 'No captured installed CFE')
     config = json.loads(Path(config_path).read_text(encoding='utf-8-sig'))
@@ -39,24 +39,30 @@ def check_configuration(receipt, config_path, evidence_dir=None):
     lease_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(lease_module)
     lease = lease_module.Lease(config['lease_key'])
-    folder = Path(evidence_dir) if evidence_dir else receipt.folder/'platform-config-check'
+    require(extension in ('ИИКона', 'Тесты'), 'Unsupported native compiler extension')
+    record_name = 'platform-config-check' if extension == 'ИИКона' else 'platform-tests-config-check'
+    folder = Path(evidence_dir) if evidence_dir else receipt.folder/record_name
     folder.mkdir(exist_ok=False)
     log = folder/'check.log'
+    flags = (['-ThinClient', '-Server', '-ExternalConnection'] if extension == 'Тесты' else FLAGS)
+    command = '/CheckModules' if extension == 'Тесты' else '/CheckConfig'
+    scope_args = ['-AllExtensions'] if extension == 'Тесты' else ['-Extension', extension]
     record = {'run_id': receipt.spec['run_id'], 'source_hash': receipt.spec['source_hash'],
               'started': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              'extension': 'ИИКона', 'flags': FLAGS}
+              'extension': extension, 'flags': flags, 'command': command,
+              'scope': 'AllExtensionsRuntimeModules' if extension == 'Тесты' else 'ProductExtension'}
     process = None
     try:
         idle(config)
         arguments = [str(Path(config['platform_bin'])/'1cv8.exe'), 'DESIGNER',
                      launch_argument(config['connection']), *designer_authentication(config['connection']),
-                     '/CheckConfig', *FLAGS, '-Extension', 'ИИКона', '/Out', str(log),
+                     command, *flags, *scope_args, '/Out', str(log),
                      '/DisableStartupDialogs', '/DisableStartupMessages']
         process = subprocess.Popen(arguments, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                    creationflags=subprocess.CREATE_NO_WINDOW)
         record['pid'] = process.pid
         (folder/'started.json').write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding='utf-8')
-        print('Native compiler check PID', process.pid, flush=True)
+        print('Native compiler check', extension, 'PID', process.pid, flush=True)
         while True:
             try:
                 code = process.wait(timeout=30)
@@ -67,9 +73,13 @@ def check_configuration(receipt, config_path, evidence_dir=None):
         record.update(classify_check(code, log.exists(), text))
         record['finished'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
         (folder/'result.json').write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding='utf-8')
-        record_check(receipt, 'platform-config-check', record)
+        record_check(receipt, record_name, record)
         require(record['passed'], 'Native compiler rejected the installed extension; inspect the saved check.log')
         idle(config)
+        if extension == 'Тесты':
+            receipt.unchanged()
+            print('Native compiler passed for the installed test extension', flush=True)
+            return record
         # Verify that external connection reaches the intentional HTTP-context guard.
         # This compiles the whole dispatcher in the context that failed before the fix.
         import win32com.client
@@ -103,8 +113,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-folder', required=True)
     parser.add_argument('--base-config', required=True)
+    parser.add_argument('--extension', choices=('ИИКона', 'Тесты'), default='ИИКона')
     args = parser.parse_args()
-    check_configuration(Receipt(args.run_folder), args.base_config)
+    check_configuration(Receipt(args.run_folder), args.base_config, extension=args.extension)
 
 
 if __name__ == '__main__':

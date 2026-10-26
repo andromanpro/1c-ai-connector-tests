@@ -17,6 +17,37 @@ def local_model_fixture():
             payload=json.loads(self.rfile.read(int(self.headers.get('Content-Length','0'))))
             scenario=self.path.strip('/').split('/')[0]
             events.append({'scenario':scenario,'body':payload,'synthetic_header':self.headers.get('X-Iikona-Test',''),'authorization_present':'Authorization' in self.headers})
+            if scenario.startswith('monitor-'):
+                if not str(payload.get('model', '')).startswith('monitor-fixture-'):
+                    raise AssertionError('Only isolated synthetic monitoring models are allowed')
+                if scenario == 'monitor-unknown-disconnect':
+                    self.connection.shutdown(socket.SHUT_RDWR)
+                    self.connection.close()
+                    self.close_connection = True
+                    return
+                code = 200
+                answer = [{'номер': i, 'критичность': 'средняя', 'описание': 'Synthetic confirmed analysis'}
+                          for i in (1, 2)]
+                if scenario == 'monitor-known-fallback':
+                    individual_count = sum(e['body'].get('model') == payload['model'] for e in events)
+                    answer = ('An intentionally malformed batch response' if individual_count == 1
+                              else {'критичность': 'средняя', 'описание': 'Synthetic confirmed analysis'})
+                result = {'id': 'synthetic-monitor-request', 'object': 'chat.completion',
+                          'model': 'synthetic-monitor-model',
+                          'choices': [{'message': {'role': 'assistant', 'content': json.dumps(answer, ensure_ascii=False)},
+                                       'finish_reason': 'stop'}],
+                          'usage': {'prompt_tokens': 7, 'completion_tokens': 3, 'total_tokens': 10}}
+                if scenario in ('monitor-unknown-http502', 'monitor-known-http400'):
+                    code = 502 if scenario == 'monitor-unknown-http502' else 400
+                    result = {'error': {'message': 'Synthetic monitoring failure'}}
+                raw = json.dumps(result, ensure_ascii=False).encode('utf-8')
+                self.send_response(code)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Content-Length', str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
+
             if scenario.startswith('emb-'):
                 mode=scenario[4:]
                 texts=payload.get('input')

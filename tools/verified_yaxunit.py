@@ -70,7 +70,7 @@ def idle(config):
 
 def wait_for_owned_client_cleanup(config, process, close_requested, timeout_s=90):
     """Recheck an empty stand after this client exited; never allow an unknown session."""
-    require(process.poll() == 0 and not close_requested, 'Owned client did not exit normally')
+    require(process.poll() is not None, 'Owned client is still running')
     started = time.monotonic()
     deadline = started + timeout_s
     notice = started + 20
@@ -264,8 +264,9 @@ def main():
                                         'initialization_error': initialization_error is not None,
                                         'fixture_requests': len(events),
                                         'fixture_scenarios': dict(collections.Counter(e['scenario'] for e in events))})
-        if process.returncode == 0 and not close_requested and initialization_error is None:
-            receipt.record('owned-client-cleanup', wait_for_owned_client_cleanup(config, process, close_requested))
+        # A failed client also needs server-session cleanup before readback. The exit
+        # status and missing/failed JUnit are still rejected by receipt.junit below.
+        receipt.record('owned-client-cleanup', wait_for_owned_client_cleanup(config, process, close_requested))
         capture_runtime(receipt, config, 'after')
         require(expert_checks_passed, 'Expert HTTP fixture checks failed')
         require_clean_events(database_events)

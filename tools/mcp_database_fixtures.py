@@ -86,6 +86,22 @@ def local_database_fixture(enabled=True, port=PORT):
                                 'database_id': ID_B if scenario in ('source-b', 'wrong-id') else ID_A,
                                 'connection_protocol': 1, 'configuration_name': scenario,
                                 'configuration_version': '1'}
+                    elif tool == 'get_object_structure':
+                        arguments = params['arguments']
+                        event['structure_arguments'] = arguments
+                        if scenario not in ('source-a', 'source-b') or arguments.get('name') != 'RemoteOnly':
+                            raise AssertionError('Unexpected remote structure request')
+                        offset = arguments.get('offset', 0)
+                        limit = arguments.get('limit', 20)
+                        all_items = [{'name': name, 'synonym': name, 'type': 'Number', 'required': False,
+                                      'section': 'attributes', 'path': 'attributes.' + name}
+                                     for name in ('RemoteA', 'RemoteB', 'RemoteC')]
+                        items = all_items[offset:offset+limit]
+                        following = offset + len(items)
+                        data = {'canonical_ref': 'Catalog.RemoteOnly', 'type': 'Catalog', 'name': 'RemoteOnly',
+                                'synonym': 'Remote only object', 'paged': True, 'section': 'all', 'items': items,
+                                'offset': offset, 'limit': limit, 'total_count': len(all_items),
+                                'returned_count': len(items), 'next_offset': following, 'has_more': following < len(all_items)}
                     elif tool == 'execute_query':
                         if scenario == 'tool-error':
                             self.reply(200, {'jsonrpc': '2.0', 'id': request['id'],

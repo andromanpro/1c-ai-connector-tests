@@ -20,6 +20,11 @@ class CompilerEvidenceTest(unittest.TestCase):
         text = '{ИИКона ОбщийМодуль.Модуль.Модуль(1,1)}: Переменная не определена\n'
         self.assertFalse(classify_check(0, True, text)['passed'])
 
+    def test_test_extension_compilation_failure_is_also_rejected(self):
+        text = ('{Тесты ОбщийМодуль.Тесты_КИИ_МониторингОшибок.Модуль(112,89)}: '
+                "Ожидается символ ','\n")
+        self.assertFalse(classify_check(0, True, text)['passed'])
+
     def test_missing_log_is_not_success(self):
         self.assertFalse(classify_check(0, False, '')['passed'])
 
