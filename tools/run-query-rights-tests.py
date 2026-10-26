@@ -16,9 +16,10 @@ EXPECTED_MODULES={'Тесты_КИИ_ПакетноеЧтение':10,'Тест�
 EXPECTED=93
 
 class Lease:
-    def __init__(self,base):
+    def __init__(self,base,*,directory=None):
         key=hashlib.sha256(str(Path(base).resolve()).casefold().encode('utf-8')).hexdigest()[:24]
-        folder=Path('F:/temp/iiexam-operation-leases');folder.mkdir(exist_ok=True)
+        folder=Path(directory) if directory is not None else Path('F:/temp/iiexam-operation-leases');folder.mkdir(exist_ok=True)
+        self.block_path=folder/(key+'.needs-attention.json')
         self.file=(folder/(key+'.lock')).open('a+b')
         if self.file.seek(0,os.SEEK_END)==0:self.file.write(b'0');self.file.flush()
         self.file.seek(0)
@@ -26,7 +27,14 @@ class Lease:
         except OSError:
             self.file.close();self.file=None
             raise RuntimeError('База занята нашим другим прогоном. Подключение не выполнялось.') from None
+        if self.block_path.exists():
+            self.release()
+            raise RuntimeError('Previous client requires verified recovery; base remains blocked: '+str(self.block_path))
         atexit.register(self.release)
+    def retain(self,evidence):
+        with self.block_path.open('x',encoding='utf-8') as stream:
+            json.dump(evidence,stream,ensure_ascii=False,indent=2)
+            stream.flush();os.fsync(stream.fileno())
     def release(self):
         if self.file is None:return
         self.file.seek(0);msvcrt.locking(self.file.fileno(),msvcrt.LK_UNLCK,1);self.file.close();self.file=None

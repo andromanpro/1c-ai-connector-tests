@@ -34,6 +34,14 @@ class StartupGuardTests(unittest.TestCase):
     def test_normal_initialization_is_not_failure(self):
         self.assertIsNone(startup_failure('Инициализация: выполнена\nТесты запущены'))
 
+    def test_real_global_error_loop_is_fatal(self):
+        result = startup_failure('Зацикливание обработки глобальной ошибки, дальнейшая работа YAxUnit прервана')
+        self.assertIsNotNone(result)
+        self.assertEqual(result['kind'], 'global-error-loop')
+
+    def test_expected_test_text_is_not_global_error_loop(self):
+        self.assertIsNone(startup_failure('Проверяем текст ошибки: Зацикливание обработки глобальной ошибки'))
+
     def test_no_error_summary_does_not_trigger_failure(self):
         self.assertIsNone(startup_failure('Инициализация: ошибок нет'))
 

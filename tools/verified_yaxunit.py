@@ -170,6 +170,96 @@ def client_arguments(config, configuration, platform_log):
     return result
 
 
+def registered_test_filter(selection):
+    """Only module/method names go to YAxUnit; case labels stay in the receipt."""
+    require(isinstance(selection, list) and selection, 'Empty test selection')
+    require(all(isinstance(name, str) for name in selection), 'Invalid test selection')
+    require(len(selection) == len(set(selection)), 'Duplicate expected test cases')
+    methods = set()
+    for case in selection:
+        match = re.fullmatch(r'([^\W\d]\w*)\.([^\W\d]\w*)(?:\(.*\))?', case)
+        require(match is not None, 'Invalid expected test case: ' + case)
+        methods.add(match[1] + '.' + match[2])
+    return {'modules': sorted({name.split('.')[0] for name in methods}), 'tests': sorted(methods)}
+
+
+def fatal_client_log(folder, allow_busy=True, include_debug=False):
+    from yaxunit_startup_guard import startup_failure
+    # YAxUnit repeatedly opens its own log exclusively. A concurrent reader can
+    # prevent the next write even when it allows sharing on its own handle.
+    names = ('platform.log', 'yaxunit-debug.log') if include_debug else ('platform.log',)
+    for name in names:
+        path = folder / name
+        if path.exists():
+            try:
+                raw = path.read_bytes()
+            except PermissionError:
+                if not allow_busy:
+                    raise
+                # The writer can hold an exclusive Windows handle between flushes.
+                # Retry on the next poll; timeout and normal-close grace still apply.
+                continue
+            for encoding in ('utf-8-sig', 'cp1251'):
+                result = startup_failure(raw.decode(encoding, errors='replace'))
+                if result:
+                    return dict(result, log=name)
+    return None
+
+
+def wait_for_client(process, folder, timeout_s, request_close, close_grace_s=30,
+                    clock=time.monotonic, sleep=time.sleep):
+    """Return attention after bounded normal-close grace, without killing the client."""
+    started = clock()
+    close_at = None
+    close_windows = 0
+    initialization_error = None
+    failure_reason = None
+    notice = started + 45
+    while process.poll() is None:
+        now = clock()
+        if initialization_error is None:
+            initialization_error = fatal_client_log(folder)
+        if close_at is None and (initialization_error is not None or now - started >= timeout_s):
+            failure_reason = initialization_error['kind'] if initialization_error else 'timeout'
+            close_at = now
+            close_windows = request_close(process.pid)
+            print('Requested normal close of owned client:', failure_reason,
+                  'windows:', close_windows, flush=True)
+        if close_at is not None and now - close_at >= close_grace_s:
+            return {'state': 'needs_attention', 'pid': process.pid, 'failure_reason': failure_reason,
+                    'normal_close_requested': True, 'close_windows': close_windows,
+                    'initialization_error': initialization_error, 'elapsed_s': round(now - started, 1)}
+        if now >= notice:
+            print('Test client running:', round(now - started), 's', flush=True)
+            notice = now + 45
+        sleep(1)
+    initialization_error = initialization_error or fatal_client_log(folder, allow_busy=False, include_debug=True)
+    return {'state': 'exited', 'pid': process.pid, 'exit_code': process.returncode,
+            'elapsed_s': round(clock() - started, 1), 'normal_close_requested': close_at is not None,
+            'close_windows': close_windows, 'initialization_error': initialization_error,
+            'failure_reason': failure_reason or (initialization_error or {}).get('kind')}
+
+
+def request_owned_close(legacy, pid):
+    import win32gui
+    windows = legacy.own_windows(pid)
+    for hwnd in windows:
+        win32gui.PostMessage(hwnd, 0x0010, 0, 0)
+    return len(windows)
+
+
+def retain_live_client(lease, receipt, process, reason):
+    import psutil
+    evidence = {'state': 'needs_attention', 'pid': process.pid,
+                'process_created_at': psutil.Process(process.pid).create_time(),
+                'run_folder': str(receipt.folder), 'target': receipt.spec['target'],
+                'reason': reason, 'force_kill': False, 'recovery_required': True}
+    lease.retain(evidence)
+    if not (receipt.folder / 'client-needs-attention.json').exists():
+        receipt.record('client-needs-attention', evidence)
+    print('Client needs attention; base remains blocked for recovery:', process.pid, flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-folder', type=Path, required=True)
@@ -180,6 +270,7 @@ def main():
     receipt = Receipt(options.run_folder)
     config = json.loads(options.base_config.read_text(encoding='utf-8'))
     require(public_base(config['connection']) == receipt.spec['target'], 'Wrong configured base')
+    selected_filter = registered_test_filter(receipt.spec['tests'])
     # Reuse the established shared base lease, without rewriting runner source.
     spec = importlib.util.spec_from_file_location('base_runner', Path(__file__).with_name('run-query-rights-tests.py'))
     legacy = importlib.util.module_from_spec(spec)
@@ -190,8 +281,7 @@ def main():
         capture_runtime(receipt, config, 'before')
         selection = receipt.spec['tests']
         cfg = receipt.folder / 'yaxunit.json'
-        cfg.write_text(json.dumps({'filter': {'modules': sorted({x.split('.')[0] for x in selection}),
-                                             'tests': selection},
+        cfg.write_text(json.dumps({'filter': selected_filter,
                                   'reportFormat': 'jUnit', 'reportPath': str(receipt.folder / 'junit.xml'),
                                   'closeAfterTests': True, 'showReport': False,
                                   'logging': {'file': str(receipt.folder / 'yaxunit-debug.log'),
@@ -225,27 +315,15 @@ def main():
                                        creationflags=subprocess.CREATE_NO_WINDOW, startupinfo=startup)
             receipt.record('client-started', {'pid': process.pid})
             print('Run', receipt.spec['run_id'], 'PID', process.pid, 'tests', len(selection), flush=True)
-            notice = started + 45
-            while process.poll() is None:
-                elapsed = time.monotonic() - started
-                if initialization_error is None:
-                    from yaxunit_startup_guard import startup_failure
-                    platform_log = receipt.folder / 'platform.log'
-                    if platform_log.exists():
-                        initialization_error = startup_failure(platform_log.read_text(encoding='utf-8-sig', errors='replace'))
-                    if initialization_error:
-                        receipt.record('startup-failure', initialization_error)
-                        print('YAxUnit initialization failed; tests did not start:',
-                              initialization_error['kind'], flush=True)
-                if (initialization_error is not None or elapsed > options.timeout) and not close_requested:
-                    import win32gui
-                    for hwnd in legacy.own_windows(process.pid):
-                        win32gui.PostMessage(hwnd, 0x0010, 0, 0)
-                    close_requested = True
-                if time.monotonic() > notice:
-                    print('Test client running:', round(elapsed), 's', flush=True)
-                    notice = time.monotonic() + 45
-                time.sleep(1)
+            lifecycle = wait_for_client(process, receipt.folder, options.timeout,
+                                        lambda pid: request_owned_close(legacy, pid))
+            close_requested = lifecycle['normal_close_requested']
+            initialization_error = lifecycle['initialization_error']
+            if initialization_error:
+                receipt.record('startup-failure', initialization_error)
+            if lifecycle['state'] == 'needs_attention':
+                retain_live_client(lease, receipt, process, lifecycle['failure_reason'])
+                return 2
         (receipt.folder / 'expert-fixture-events.json').write_text(
             json.dumps(expert_events, ensure_ascii=False, indent=2), encoding='utf-8')
         expert_checks_passed = (not any('fixture_error' in event for event in expert_events)
@@ -268,6 +346,7 @@ def main():
         # status and missing/failed JUnit are still rejected by receipt.junit below.
         receipt.record('owned-client-cleanup', wait_for_owned_client_cleanup(config, process, close_requested))
         capture_runtime(receipt, config, 'after')
+        require(initialization_error is None, 'YAxUnit fatal startup error; run rejected')
         require(expert_checks_passed, 'Expert HTTP fixture checks failed')
         require_clean_events(database_events)
         require_clean_dsml_events(dsml_events)
@@ -275,10 +354,12 @@ def main():
         print(json.dumps(result, ensure_ascii=False))
         return 0
     finally:
-        # Keep ownership and lease if the caller is interrupted. Never leave a
-        # running client behind and then let another updater enter the base.
+        # A live child blocks later operations persistently, even if this runner exits.
         if process is not None and process.poll() is None:
-            process.wait()
+            if not lease.block_path.exists():
+                error = sys.exc_info()[1]
+                reason = 'runner-error:' + type(error).__name__ if error is not None else 'runner-interrupted'
+                retain_live_client(lease, receipt, process, reason)
         lease.release()
 
 

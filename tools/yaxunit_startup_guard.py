@@ -14,6 +14,10 @@ def require_startup_roles(roles):
 
 def startup_failure(text):
     lines = text.replace('\r', '').splitlines()
+    fatal = 'Зацикливание обработки глобальной ошибки, дальнейшая работа YAxUnit прервана'
+    if any(fatal in line for line in lines):
+        return {'stage': 'yaxunit-initialization', 'kind': 'global-error-loop',
+                'test_execution_proven': False, 'diagnostic': text.strip()}
     starts = [i for i, line in enumerate(lines)
               if re.match(r'^\s*Инициализация:\s*Ошибка(?:\s|[.:]|$)', line, re.IGNORECASE)]
     if not starts:
