@@ -96,6 +96,16 @@ def xml_module_path(relative):
     return Path(*parts[:-1]) / 'Ext' / parts[-1]
 
 
+def snapshot_project_name(descriptor):
+    """Import and export must address the same Eclipse project identity."""
+    root = ET.fromstring(descriptor)
+    require(root.tag == 'projectDescription', 'Expected an Eclipse project description')
+    name = root.findtext('name')
+    require(name is not None and name.strip() == name and bool(name), 'Missing Eclipse project name')
+    require(name not in ('.', '..') and not any(c in name for c in '/\\:'), 'Invalid Eclipse project name')
+    return name
+
+
 def normalize_export_module(path):
     """Preserve BSL text while giving the native compiler explicit CRLF lines."""
     original = path.read_bytes()
@@ -136,15 +146,15 @@ def export(receipt, projects, edt_cli, context_projects=None, cli_profile=None):
             commands.append(f'import --project "{snapshot.as_posix()}"')
         for extension, item in projects.items():
             project = Path(item['project']).resolve(strict=True)
-            snapshot = out / 'snapshot' / project.name
+            require((project / '.project').is_file(), 'Missing EDT project description')
+            descriptor_key = 'edt_descriptions/' + project.name + '.project'
+            descriptor = archive.read(descriptor_key) if descriptor_key in archive.namelist() else (project / '.project').read_bytes()
+            snapshot = out / 'snapshot' / snapshot_project_name(descriptor)
             snapshot.mkdir(parents=True, exist_ok=False)
             for filename in ('.project',):
                 require((project / filename).exists(), 'Missing EDT project description')
                 
-                if 'edt_descriptions/' + project.name + '.project' in archive.namelist():
-                    (snapshot / filename).write_bytes(archive.read('edt_descriptions/' + project.name + '.project'))
-                else:
-                    shutil.copy2(project / filename, snapshot / filename)
+                (snapshot / filename).write_bytes(descriptor)
             for key, dirname in (('source_label', 'src'), ('dt_label', 'DT-INF')):
                 prefix = item[key] + '/'
                 for name in archive.namelist():
