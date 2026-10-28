@@ -12,6 +12,7 @@ import zipfile
 
 from verification_receipt import Receipt, require, digest, exported_tree, tree_hash, compare_files
 from bsl_readability_check import check_paths
+from edt_export_retention import compact_export
 
 
 def review_cli_diagnostics(out, projects):
@@ -121,7 +122,7 @@ def normalize_export_module(path):
             'text_sha256': digest(text.encode('utf-8'))}
 
 
-def export(receipt, projects, edt_cli, context_projects=None, cli_profile=None):
+def _export(receipt, projects, edt_cli, context_projects=None, cli_profile=None, execution=None):
     receipt.unchanged()
     out = receipt.folder / 'export'
     out.mkdir(exist_ok=False)
@@ -191,6 +192,9 @@ def export(receipt, projects, edt_cli, context_projects=None, cli_profile=None):
         print('Fresh CLI export PID', process.pid, flush=True)
         # Do not forcibly stop the JVM or reuse a workspace after interruption.
         code = process.wait()
+    if execution is not None:
+        execution['exited'] = True
+    receipt.record('edt-cli-exited', {'pid': process.pid, 'exit_code': code})
     require(code == 0, f'EDT export failed, exit code {code}; see {out / "cli.log"}')
     diagnostic_review = review_cli_diagnostics(out, proof)
     receipt.record('edt-diagnostics-review', diagnostic_review)
@@ -222,11 +226,23 @@ def export(receipt, projects, edt_cli, context_projects=None, cli_profile=None):
     return proof
 
 
+def export(receipt, projects, edt_cli, context_projects=None, cli_profile=None, keep_workspace=False):
+    execution = {}
+    try:
+        return _export(receipt, projects, edt_cli, context_projects, cli_profile, execution=execution)
+    finally:
+        # An interrupted wait leaves a possibly live JVM: only its exit permits cleanup.
+        if execution.get('exited'):
+            retention = compact_export(receipt.folder / 'export', keep_workspace=keep_workspace)
+            receipt.record('edt-export-retention', retention)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-folder', type=Path, required=True)
     parser.add_argument('--projects', type=Path, required=True)
     parser.add_argument('--edt-cli', type=Path, required=True)
+    parser.add_argument('--keep-workspace', action='store_true', help='Explicitly retain the full EDT environment for diagnosis')
     args = parser.parse_args()
     print(json.dumps(export(Receipt(args.run_folder), json.loads(args.projects.read_text(encoding='utf-8')),
-                            args.edt_cli), ensure_ascii=False))
+                            args.edt_cli, keep_workspace=args.keep_workspace), ensure_ascii=False))
