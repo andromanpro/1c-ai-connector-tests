@@ -1,0 +1,155 @@
+{
+  "schema": 2,
+  "run_id": "20261029T122210Z-774372de09df",
+  "source_hash": "3069b77c8f1808c69ff75ef9689089761e4327332997ed2873a199e86c1a3bf5",
+  "product_version": "1.8.8",
+  "tests_version": "1.8.7",
+  "artifacts": {
+    "IIkona-1.8.8.cfe": {
+      "sha256": "3c155a9294d7d23ee784364b9e1476780337afa140a7bae573157a3f4e382102",
+      "bytes": 1945903
+    },
+    "IIkona-tests-1.8.7.cfe": {
+      "sha256": "d35afcdc06903e2c120b3061c58efc646dd16b394d52389b85ddd1715a08acd8",
+      "bytes": 259951
+    }
+  },
+  "main": {
+    "passed": 1081,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "contexts": {
+      "Сервер": 1054,
+      "КлиентУправляемоеПриложение": 27
+    },
+    "junit_sha256": "c8a26eb1671c6b555b16eee0516c6bfe519090315dc12a6dde10cc31ca5a3810",
+    "engine": "EDT RuntimeClient"
+  },
+  "native_compiler": {
+    "passed": true,
+    "diagnostics": 0,
+    "product_contexts": 7,
+    "test_runtime_checked": true,
+    "target": "disposable factory; exact tested CFEs and original SQL-stand base CF"
+  },
+  "ordinary_roles": {
+    "unique_scenarios": 8,
+    "profiles": 5,
+    "executions": 40,
+    "passed": 40,
+    "cleanup_complete": true,
+    "additional_product_roles": [],
+    "privileged_bypass": false,
+    "cases": {
+      "system_admin": {
+        "passed": 8,
+        "junit_sha256": "beb0a32777d28b5f2da508361c9d8cfccef8222bed8dcb899f6d41367110ddf9"
+      },
+      "a": {
+        "passed": 8,
+        "junit_sha256": "dd7b046ea7fc7ffc1cd2a07cd2a85b87bfb454dbf7261e00f9395d560ac4c116"
+      },
+      "b": {
+        "passed": 8,
+        "junit_sha256": "0fdd6ad23830ea066d24f5d8fba2dca3215e833c7c6f911eb26b0706385b83b0"
+      },
+      "viewer": {
+        "passed": 8,
+        "junit_sha256": "26a5c249d136ce65194312ef39fd79b11b5cf470e4bda6ebf1fec8edd4562dc6"
+      },
+      "diagnostic": {
+        "passed": 8,
+        "junit_sha256": "a18b0c2c59ff847810dc0542fb4fdfc505a8bc36b845ed76a2079f28206074b1"
+      }
+    },
+    "source_hash": "d85dcf8a94ed823b6f6d77f7208563c2867bd49330a697f82cdc7513dfd7c049",
+    "reused_from_version": "1.8.7",
+    "new_role_executions": 0,
+    "roles_and_monitoring_consumers_unchanged": true
+  },
+  "preservation": {
+    "passed": true,
+    "business_values_exact": true,
+    "tables": 25,
+    "rows": 526,
+    "users": 2,
+    "constants": 22,
+    "model_keys": 1,
+    "strict_serialized_comparison": false,
+    "technical_differences": {
+      "model_row_revision": true,
+      "token_column_precision": [
+        5,
+        10
+      ]
+    },
+    "strict_refusal_retained": true
+  },
+  "native_delivery_readback": {
+    "all_product_bsl_modules": 92,
+    "all_product_bsl_exact": true,
+    "changed_template_exact": true,
+    "version_exact": true,
+    "token_precision_exact": true,
+    "independent_full_edt_xml_comparison": false,
+    "unchanged_test_xml_reused_from": "1.8.7",
+    "native_update_job": "fdd12569-00fa-4eee-a599-e50ca4b0c16d"
+  },
+  "runtime_before_after_equal": true,
+  "shared_layer": {
+    "passed": true,
+    "manifest_sha256": "c45fd6454b89813cef25283a1ea1cca873888650fd7327ff0c2a6b56ac1e41f0",
+    "product_files": 296,
+    "shared_test_files": 71
+  },
+  "sonar": {
+    "analysis_id": "AaGHsRvUq1oI51Knpac_",
+    "gate": "OK",
+    "unresolved_issues": 0,
+    "hotspots_safe": 47
+  },
+  "mermaid_native": {
+    "passed": 4,
+    "entries_per_case": [
+      "1C",
+      "browser-load"
+    ],
+    "installed_cfe_exact": true,
+    "provider_calls": 0
+  },
+  "readability": {
+    "files": 125,
+    "issues": 0
+  },
+  "adapter_contract_tests": {
+    "reused_from_version": "1.8.7",
+    "source_files_exactly_unchanged": true,
+    "new_provider_inferences": 0
+  },
+  "verification_limits": [
+    "The tests extension is unchanged version 1.8.7, rerun against product 1.8.8.",
+    "The separate 40 role executions belong to 1.8.7 and are explicitly reused; roles and monitoring consumers are unchanged.",
+    "Seven-context compiler verification is on a disposable file factory built from the original SQL stand base CF, not a second run on the occupied SQL Designer.",
+    "Native delivery and installed-source readback replace the repeated full EDT CLI export; no independent second full EDT XML comparison is claimed.",
+    "Technical model row revision and token-column precision changed; every business value, key, constant and user is exact. The first strict refusal is retained.",
+    "Mermaid render calls are observed in Node on actual BSL output, not every visual 1C HTML engine.",
+    "No new provider generation or confirmation of the remote Boyko incident was performed."
+  ],
+  "adapter_source": {
+    "files": {
+      "accounts.py": "afd91f898bdeb311ad83a4da06bed024e1799cdfe20430f63a7bb615956c2906",
+      "configure_glm.py": "f9b135012f1e96495e32386b2ac0dc7df73d7f1dfc89e544993714a5448f403a",
+      "glm_client.py": "4e8cb862ff3dfb01e541f9ab4394cc97f84e78c62ff4e1020281262e02368878",
+      "manage.py": "43a12b7672e94317527a837b6f83e007c0a7ee26b2cd4ea928149a59e798b6f1",
+      "protocol.py": "076bb6fd323203208fe26fe272143e9f61a6de1eba4788201103451317631b87",
+      "receipt_maintenance.py": "4f624b1c92d9deb3fb8269511c76d09894845a7bf7edbff7b9497f8aa030e207",
+      "requirements.txt": "afce9f76c28036a32a8f1dd9c2a1cd83486bf072975433a288f2bd157ea64d82",
+      "server.py": "9d0f2fa215b3be7b072583c21520c7c4ee9cb2fec7aa811cf7dde71bdec4f5cc",
+      "test_adapter.py": "9d09f52d20f99aa8b9e927b07c8688b4cb0c80cbc4cd007ca75fa9b509cfb652",
+      "test_glm_wire.py": "bbcd95df7fa62c1861ee66cf50c60f492bc9d89250492269b1800d7cc5f4f6ca",
+      "test_receipt_maintenance.py": "571e970228df433df74eeed16d6d0650bb15e88af7d1b09bac927a862575094c"
+    },
+    "changed": false
+  }
+}

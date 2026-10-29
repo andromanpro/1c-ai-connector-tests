@@ -1,0 +1,52 @@
+{
+  "run_id": "20261029T122210Z-774372de09df",
+  "source_hash": "3069b77c8f1808c69ff75ef9689089761e4327332997ed2873a199e86c1a3bf5",
+  "passed": true,
+  "cases": [
+    {
+      "case": 0,
+      "exact_arguments": true,
+      "one_call_per_entry": true,
+      "entries": [
+        "1C",
+        "browser-load"
+      ]
+    },
+    {
+      "case": 1,
+      "exact_arguments": true,
+      "one_call_per_entry": true,
+      "entries": [
+        "1C",
+        "browser-load"
+      ]
+    },
+    {
+      "case": 2,
+      "exact_arguments": true,
+      "one_call_per_entry": true,
+      "entries": [
+        "1C",
+        "browser-load"
+      ]
+    },
+    {
+      "case": 3,
+      "exact_arguments": true,
+      "one_call_per_entry": true,
+      "entries": [
+        "1C",
+        "browser-load"
+      ]
+    }
+  ],
+  "input_sha256": "e6b52354975cbe987db32b4bcf997ab4092f0bbec8753732ed453a9ac60fe716",
+  "observer_sha256": "6a204b00d7ab75f383ce3e5ea601ee3e96bd580e16ad03229b6822b93df8b330",
+  "installed_cfe_exact": true,
+  "database_mutations": 0,
+  "external_model_calls": 0,
+  "first_observer_failure": "Observer initially expected onload instead of the template's autoRenderEmbedded and load listener; product not changed",
+  "limitations": [
+    "Real BSL output checked in Node; not a visual test of every 1C HTML engine"
+  ]
+}

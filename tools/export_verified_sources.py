@@ -15,12 +15,20 @@ from bsl_readability_check import check_paths
 from edt_export_retention import compact_export
 
 
+def delegated_inactive_namespace_after_stop(entry, stopped_namespaces):
+    cause = re.search(r"com\._1c\.g5\.v8\.bm\.core\.BmNamespaceInactiveException: The namespace '([^']+)' is not active", entry)
+    return (cause is not None and cause.group(1) in stopped_namespaces
+            and 'com._1c.g5.v8.bm.core.BmObject.checkEngineRunningIfNecessary' in entry
+            and 'com.e1c.g5.v8.dt.bsl.check.DocumentationCommentBasicDelegateCheck.check' in entry)
+
+
 def review_cli_diagnostics(out, projects):
     """Keep tool failures visible; never equate an export return code with validation."""
     log = out / 'workspace/.metadata/.log'
     require(log.exists(), 'Missing EDT workspace diagnostics')
     entries = re.split(r'(?m)^!ENTRY ', log.read_text(encoding='utf-8', errors='strict'))
     stopped = False
+    stopped_namespaces = set()
     counts = Counter()
     unexpected = []
     for entry in entries:
@@ -31,6 +39,7 @@ def review_cli_diagnostics(out, projects):
         message = next((line.removeprefix('!MESSAGE ') for line in lines if line.startswith('!MESSAGE ')), '')
         if 'Project context is being stopped:' in message and 'IDE_SHUTDOWN' in message:
             stopped = True
+            stopped_namespaces.add(message.split('Project context is being stopped:', 1)[1].split(' (IDE_SHUTDOWN)', 1)[0].strip())
         if header[1] != '4':
             continue
         if header[0] == 'com.e1c.g5.dt.applications.infobases.ui' and message == 'Skipping the lifecycle event because workbench is not running':
@@ -38,6 +47,8 @@ def review_cli_diagnostics(out, projects):
         elif header[0].startswith('com.e1c.edt.ai') and message == 'HTTP connect timed out':
             kind = 'unrelated_edt_assistant_timeout'
         elif stopped and ((message == 'Delegated check thrown an exception' and 'BmModelManager.getDtProject' in entry)
+                or (header[0] == 'com.e1c.g5.v8.dt.check' and message == 'Delegated check thrown an exception'
+                    and delegated_inactive_namespace_after_stop(entry, stopped_namespaces))
                 or (message == 'InvocationTargetException' and 'BmNamespaceInactiveException' in entry)
                 or message.startswith('Failed to check marker duplicates for markers:')):
             kind = 'open_vendor_shutdown_failure'

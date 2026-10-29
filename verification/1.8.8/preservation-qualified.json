@@ -1,0 +1,21 @@
+{
+  "run_id": "20261029T122210Z-774372de09df",
+  "source_hash": "3069b77c8f1808c69ff75ef9689089761e4327332997ed2873a199e86c1a3bf5",
+  "passed": true,
+  "strict_serialized_table_comparison": false,
+  "strict_refusal_retained": true,
+  "business_model_values_exact": true,
+  "technical_cell_differences": [
+    "ВерсияДанных"
+  ],
+  "change_timing_limitation": "The row revision changed between the pre-update baseline and the post-test observation; its exact time within that interval was not captured",
+  "column_type_change": {
+    "name": "МаксимумТокенов",
+    "before_precision": 5,
+    "after_precision": 10
+  },
+  "other_tables_exact": 24,
+  "users_exact": true,
+  "keys_exact": true,
+  "constants_exact": true
+}
