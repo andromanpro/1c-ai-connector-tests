@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "target": "server:localhost/iikona_perf_20261011",
+  "paid_calls": 0,
+  "transaction_rollback": true,
+  "register_event_present_in_transaction": true,
+  "correlation_id": "259782ba-5b99-4e6d-a62d-bb6dbe2e2d0e",
+  "code": "query_failed",
+  "source_events": 1,
+  "deduplicated_events": 1,
+  "registers_before": {
+    "КИИ_МониторингОшибокЖурнал": {
+      "rows": 24,
+      "sha256": "6b9439d2527c919a170b05821911c1d9ad7f09d945deddd058fbd9cf090c40f8"
+    },
+    "КИИ_МониторингОшибокСтатистика": {
+      "rows": 48,
+      "sha256": "d555a532e1956ce46c25dd80a2408662dafc1a913fcaa5320fa34a507f9946ed"
+    },
+    "КИИ_МониторингОшибокСостояниеСбора": {
+      "rows": 0,
+      "sha256": "ae4c10cc66715936a27e3e9dc630cce240ba2a02e5dddd3b1840bb6119fc5217"
+    }
+  },
+  "registers_after": {
+    "КИИ_МониторингОшибокЖурнал": {
+      "rows": 24,
+      "sha256": "6b9439d2527c919a170b05821911c1d9ad7f09d945deddd058fbd9cf090c40f8"
+    },
+    "КИИ_МониторингОшибокСтатистика": {
+      "rows": 48,
+      "sha256": "d555a532e1956ce46c25dd80a2408662dafc1a913fcaa5320fa34a507f9946ed"
+    },
+    "КИИ_МониторингОшибокСостояниеСбора": {
+      "rows": 0,
+      "sha256": "ae4c10cc66715936a27e3e9dc630cce240ba2a02e5dddd3b1840bb6119fc5217"
+    }
+  },
+  "monitoring_exact": true,
+  "collector_job_invoked": false,
+  "scope": "Actual MCP event; normal journal reader, deduplication and transactional register writer; outer rollback",
+  "limitation": "Does not establish the settings or collection history in Sergey Boyko database"
+}

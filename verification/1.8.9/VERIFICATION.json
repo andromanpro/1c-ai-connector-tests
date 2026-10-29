@@ -1,0 +1,194 @@
+{
+  "schema": 2,
+  "run_id": "20261029T170601Z-4ce21ac16331",
+  "source_hash": "316e20591faf5288e82b88d444897b2d490aa6cb435a50431520d9549aa6f939",
+  "product_version": "1.8.9",
+  "tests_version": "1.8.9",
+  "artifacts": {
+    "IIkona-1.8.9.cfe": {
+      "sha256": "c3534a8e8d14ef5c3b15b118fbf0692a9be0e310237203880998d09898a1ab2e",
+      "bytes": 1947027
+    },
+    "IIkona-tests-1.8.9.cfe": {
+      "sha256": "64431f7aaa97b457010083ab0d32509cd11b4df775b95ec733c8c75d9bec5bb1",
+      "bytes": 261237
+    }
+  },
+  "main": {
+    "passed": 1085,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "contexts": {
+      "Сервер": 1058,
+      "КлиентУправляемоеПриложение": 27
+    },
+    "junit_sha256": "c7ad26b4038c7cdb23052651774a67cdfffd0a6d0ad2d9bb4e33d18c0e30f60f",
+    "engine": "EDT RuntimeClient",
+    "repeated_cli_context_export": false
+  },
+  "native_compiler": {
+    "passed": true,
+    "diagnostics": 0,
+    "product_contexts": 7,
+    "test_contexts": [
+      "thin",
+      "server",
+      "external"
+    ],
+    "exact_tested_cfes": true,
+    "target": "disposable factory; original SQL stand base CF"
+  },
+  "ordinary_roles": {
+    "passed": 8,
+    "profiles": [
+      "basic",
+      "viewer"
+    ],
+    "cleanup_complete": true,
+    "bsp_provisioned": true,
+    "new_executions": 8,
+    "system_administration_roles": false,
+    "ordinary_com_connections": 0,
+    "privileged_bypass": false
+  },
+  "preservation": {
+    "passed": true,
+    "strict_serialized_comparison": true,
+    "tables": 25,
+    "rows": 526,
+    "constants": 22,
+    "users": 2,
+    "model_keys": 1,
+    "differences": {
+      "data": [],
+      "constants": [],
+      "users": [],
+      "catalog_ids": [],
+      "model_keys": []
+    }
+  },
+  "native_delivery_readback": {
+    "product": {
+      "bsl_modules": 92,
+      "all_bsl_exact": true,
+      "version_exact": true,
+      "decode_seconds": 3.72
+    },
+    "tests": {
+      "bsl_modules": 35,
+      "all_bsl_exact": true,
+      "version_exact": true,
+      "decode_seconds": 4.76
+    },
+    "independent_full_edt_xml_comparison": false,
+    "all_product_bsl_exact": true,
+    "all_test_bsl_exact": true,
+    "method": "Final exact installed CFE decoded offline by ibcmd; no repeated EDT export"
+  },
+  "runtime_before_after_equal": true,
+  "shared_layer": {
+    "passed": true,
+    "manifest_sha256": "8a29f1299c84c8425a195215fe3dd6c35e01a20107da5f65b9612b3e3f5c575c",
+    "product_files": 296,
+    "shared_test_files": 71
+  },
+  "sonar": {
+    "analysis_id": "AaGIp5hxq1oI51KnpkJY",
+    "gate": "OK",
+    "unresolved_issues": 0,
+    "hotspots_safe": 47
+  },
+  "journal": {
+    "passed": true,
+    "target": "server:localhost/iikona_perf_20261011",
+    "paid_calls": 0,
+    "transaction_rollback": true,
+    "register_event_present_in_transaction": true,
+    "correlation_id": "259782ba-5b99-4e6d-a62d-bb6dbe2e2d0e",
+    "code": "query_failed",
+    "source_events": 1,
+    "deduplicated_events": 1,
+    "registers_before": {
+      "КИИ_МониторингОшибокЖурнал": {
+        "rows": 24,
+        "sha256": "6b9439d2527c919a170b05821911c1d9ad7f09d945deddd058fbd9cf090c40f8"
+      },
+      "КИИ_МониторингОшибокСтатистика": {
+        "rows": 48,
+        "sha256": "d555a532e1956ce46c25dd80a2408662dafc1a913fcaa5320fa34a507f9946ed"
+      },
+      "КИИ_МониторингОшибокСостояниеСбора": {
+        "rows": 0,
+        "sha256": "ae4c10cc66715936a27e3e9dc630cce240ba2a02e5dddd3b1840bb6119fc5217"
+      }
+    },
+    "registers_after": {
+      "КИИ_МониторингОшибокЖурнал": {
+        "rows": 24,
+        "sha256": "6b9439d2527c919a170b05821911c1d9ad7f09d945deddd058fbd9cf090c40f8"
+      },
+      "КИИ_МониторингОшибокСтатистика": {
+        "rows": 48,
+        "sha256": "d555a532e1956ce46c25dd80a2408662dafc1a913fcaa5320fa34a507f9946ed"
+      },
+      "КИИ_МониторингОшибокСостояниеСбора": {
+        "rows": 0,
+        "sha256": "ae4c10cc66715936a27e3e9dc630cce240ba2a02e5dddd3b1840bb6119fc5217"
+      }
+    },
+    "monitoring_exact": true,
+    "collector_job_invoked": false,
+    "scope": "Actual MCP event; normal journal reader, deduplication and transactional register writer; outer rollback",
+    "limitation": "Does not establish the settings or collection history in Sergey Boyko database"
+  },
+  "readability": {
+    "files": 92,
+    "issues": 0
+  },
+  "test_eol_normalization": {
+    "passed": true,
+    "lines": 1711,
+    "before_cr": 1711,
+    "before_lf": 0,
+    "after_cr": 0,
+    "after_lf": 1711,
+    "all_logical_lines_exact": true,
+    "method": "CodePilot.write_file"
+  },
+  "mermaid": {
+    "reused_from": "1.8.8",
+    "cases": 4,
+    "exact_unchanged_files": {
+      "DataProcessors/КИИ_ГенераторДиаграмм/ObjectModule.bsl": "90211f50f8f5387c06e99d5739e8d9c368fe571082ad3dc5c1bb447894f20733",
+      "DataProcessors/КИИ_ГенераторДиаграмм/Templates/ШаблонMermaid/Template.txt": "6e1d79556dfa1701ca42da469d9d84557f21d44470922d7a5cd7a953c5cfc0a2"
+    },
+    "new_render_executions": 0
+  },
+  "verification_limits": [
+    "No new paid model generation; local HTTP fixtures were used.",
+    "Boyko platform8.5.1 and UT11.5.12.111 were not reproduced exactly: the defect was independently reproduced on the original SQL stand8.3.27.1989.",
+    "Journal reader, deduplication and register writer checked on a real MCP event with rollback; no change to scheduled-job settings.",
+    "Two ordinary BSP profiles were checked for the changed query-failure chain, eight executions; no new broad monitoring role suite is claimed.",
+    "Compiler check uses disposable file factory and exact tested CFEs; original SQL stand remains owned by live EDT.",
+    "CFE modules and versions are read back independently; no second complete EDT XML export is claimed.",
+    "Four prior Mermaid render cases are reused only for byte-identical unchanged files."
+  ],
+  "adapter_source": {
+    "changed": false,
+    "files": {
+      "accounts.py": "afd91f898bdeb311ad83a4da06bed024e1799cdfe20430f63a7bb615956c2906",
+      "configure_glm.py": "f9b135012f1e96495e32386b2ac0dc7df73d7f1dfc89e544993714a5448f403a",
+      "glm_client.py": "4e8cb862ff3dfb01e541f9ab4394cc97f84e78c62ff4e1020281262e02368878",
+      "manage.py": "43a12b7672e94317527a837b6f83e007c0a7ee26b2cd4ea928149a59e798b6f1",
+      "protocol.py": "076bb6fd323203208fe26fe272143e9f61a6de1eba4788201103451317631b87",
+      "receipt_maintenance.py": "4f624b1c92d9deb3fb8269511c76d09894845a7bf7edbff7b9497f8aa030e207",
+      "requirements.txt": "afce9f76c28036a32a8f1dd9c2a1cd83486bf072975433a288f2bd157ea64d82",
+      "server.py": "9d0f2fa215b3be7b072583c21520c7c4ee9cb2fec7aa811cf7dde71bdec4f5cc",
+      "test_adapter.py": "9d09f52d20f99aa8b9e927b07c8688b4cb0c80cbc4cd007ca75fa9b509cfb652",
+      "test_glm_wire.py": "bbcd95df7fa62c1861ee66cf50c60f492bc9d89250492269b1800d7cc5f4f6ca",
+      "test_receipt_maintenance.py": "571e970228df433df74eeed16d6d0650bb15e88af7d1b09bac927a862575094c"
+    },
+    "new_provider_inferences": 0
+  }
+}

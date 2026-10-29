@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "runs": {
+    "basic": {
+      "exit_code": 0,
+      "run": "F:\\temp\\iikona-audit-20261013\\runs\\20261029T171412Z-21de7d5a745f",
+      "junit": {
+        "run_id": "20261029T171412Z-21de7d5a745f",
+        "source_hash": "316e20591faf5288e82b88d444897b2d490aa6cb435a50431520d9549aa6f939",
+        "sha256": "9478c00dca41321297797e481fe47ff2b712d628180217172c1dfa0b3077bc60",
+        "total": 4,
+        "exit_code": 0,
+        "passed": true
+      }
+    },
+    "viewer": {
+      "exit_code": 0,
+      "run": "F:\\temp\\iikona-audit-20261013\\runs\\20261029T171656Z-82933b7d75f3",
+      "junit": {
+        "run_id": "20261029T171656Z-82933b7d75f3",
+        "source_hash": "316e20591faf5288e82b88d444897b2d490aa6cb435a50431520d9549aa6f939",
+        "sha256": "45054d40ebb6897699a4b9fd12dc688c8dcfd3a2239d8f848e5aed6794909d80",
+        "total": 4,
+        "exit_code": 0,
+        "passed": true
+      }
+    }
+  },
+  "cleanup_complete": true,
+  "ordinary_com_connections": 0,
+  "system_administration_roles": false,
+  "privileged_bypass": false,
+  "source_hash": "316e20591faf5288e82b88d444897b2d490aa6cb435a50431520d9549aa6f939",
+  "before_after_exact": true
+}

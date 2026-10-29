@@ -103,6 +103,14 @@ def local_database_fixture(enabled=True, port=PORT):
                                 'offset': offset, 'limit': limit, 'total_count': len(all_items),
                                 'returned_count': len(items), 'next_offset': following, 'has_more': following < len(all_items)}
                     elif tool == 'execute_query':
+                        if scenario == 'query-error':
+                            diagnostic = {'code': 'query_failed', 'message': 'Поле НетТакогоПоля не найдено',
+                                          'correlation_id': '18918918-9189-4189-8189-189189189189'}
+                            data = {'error': diagnostic}
+                            self.reply(200, {'jsonrpc': '2.0', 'id': request['id'], 'result': {
+                                'ok': False, 'tool': tool, 'isError': True, 'structuredContent': data,
+                                'content': [{'type': 'text', 'text': json.dumps(data, ensure_ascii=False)}]}})
+                            return
                         if scenario == 'tool-error':
                             self.reply(200, {'jsonrpc': '2.0', 'id': request['id'],
                                              'error': {'code': -32602, 'message': 'sensitive-password'}})

@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "tables": 25,
+  "all_current_fields": true,
+  "differences": {
+    "data": [],
+    "constants": [],
+    "users": [],
+    "catalog_ids": [],
+    "model_keys": []
+  }
+}
