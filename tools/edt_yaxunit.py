@@ -176,6 +176,17 @@ def installed_artifacts(receipt,config,names):
     return files
 
 
+def check_fixtures(receipt,events,expert,database,dsml):
+    from mcp_database_fixtures import require_clean_events
+    from dsml_fixture import require_clean_dsml_events
+    receipt.record('fixture-details',sanitize({'model':events,'expert':expert,'database':database,'dsml':dsml}))
+    receipt.record('fixture-result',{'model_requests':len(events),'expert_requests':len(expert),
+                                   'database_requests':len(database)})
+    require(not any(e.get('fixture_error') for e in expert),'Expert fixture failed')
+    require(all(c['passed'] for e in expert for c in e.get('checks',[])),'Expert fixture check failed')
+    require_clean_events(database);require_clean_dsml_events(dsml)
+
+
 def run_live_edt(options):
     require(options.plan and options.output_root,'Live EDT requires --plan and --output-root')
     plan=json.loads(options.plan.read_text(encoding='utf-8'))
@@ -202,8 +213,8 @@ def run_live_edt(options):
         from diagram_fixture import local_diagram_fixture
         from legacy_model_fixture import local_model_fixture
         from expert_tools_fixture import local_expert_fixture
-        from mcp_database_fixtures import local_database_fixture,requires_database_fixture,require_clean_events
-        from dsml_fixture import local_reproduction_fixture,require_clean_dsml_events
+        from mcp_database_fixtures import local_database_fixture,requires_database_fixture
+        from dsml_fixture import local_reproduction_fixture
         with ExitStack() as stack:
             stack.enter_context(local_fixture());stack.enter_context(local_diagram_fixture())
             events=stack.enter_context(local_model_fixture());expert=stack.enter_context(local_expert_fixture())
@@ -219,11 +230,7 @@ def run_live_edt(options):
                 import shutil
                 report=Path(result['junit_xml_path'])
                 if report.is_file():shutil.copyfile(report,receipt.folder/'junit.xml')
-        receipt.record('fixture-result',{'model_requests':len(events),'expert_requests':len(expert),
-                                       'database_requests':len(database)})
-        require(not any(e.get('fixture_error') for e in expert),'Expert fixture failed')
-        require(all(c['passed'] for e in expert for c in e.get('checks',[])),'Expert fixture check failed')
-        require_clean_events(database);require_clean_dsml_events(dsml)
+        check_fixtures(receipt,events,expert,database,dsml)
         receipt.record('owned-client-cleanup',verified.wait_for_owned_client_cleanup(config,process,False))
         verified.capture_runtime(receipt,config,'after')
         require(result.get('tests_verified') is True and result.get('status')=='completed',

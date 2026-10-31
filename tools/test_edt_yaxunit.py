@@ -63,6 +63,16 @@ class LaunchTests(unittest.TestCase):
         self.assertTrue(calls[0].args[1]['dry_run'])
         self.assertEqual(calls[2].args[1],calls[3].args[1])
 
+    def test_fixture_failure_is_saved_before_validation(self):
+        receipt=Mock()
+        event={'fixture_error':'synthetic_model_only','body':{'Authorization':'secret-value'}}
+        with self.assertRaisesRegex(VerificationError,'Expert fixture failed'):
+            edt.check_fixtures(receipt,[],[event],[],[])
+        name,details=receipt.record.call_args_list[0].args
+        self.assertEqual(name,'fixture-details')
+        self.assertEqual(details['expert'][0]['fixture_error'],'synthetic_model_only')
+        self.assertNotIn('secret-value',repr(details))
+
     def test_product_window_and_empty_log_are_not_execution(self):
         for text in ['', 'Открыта форма', 'Инициализация']:
             with self.subTest(text=text):self.assertFalse(execution_started(text))
