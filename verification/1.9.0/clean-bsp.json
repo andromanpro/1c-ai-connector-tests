@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "scratch": "F:\\temp\\iikona-clean-190\\5ff058c2fcaa",
+  "source_hash": "aa6c2925012b89a7768366dcbc38a38a442f372cc8bc47c3a50657c98200d705",
+  "product_cfe_sha256": "55056ac4c83ad6e2c2d27a161eab1f48c24bc37e9649911b8d5af4e24ea5d18d",
+  "base_cf_sha256": "bdbeab61b6d1da71854584ead54f7c1a335b7ef2fa65e712693be0a898f8791c",
+  "base_kind": "vendor SSL 3.1.11.466, 1Cv8.cf, not 1Cv8_demo.cf",
+  "steps": [
+    {
+      "name": "load-extension",
+      "exit_code": 0
+    },
+    {
+      "name": "apply-extension",
+      "exit_code": 0
+    }
+  ],
+  "configuration_name": "БиблиотекаСтандартныхПодсистем",
+  "demo_catalogs": [],
+  "extensions": [
+    {
+      "name": "ИИКона",
+      "version": "1.9.0"
+    }
+  ],
+  "compiler": {
+    "exit_code": 0,
+    "diagnostic_count": 0,
+    "flags": [
+      "-ThinClient",
+      "-WebClient",
+      "-Server",
+      "-ExternalConnection",
+      "-ExternalConnectionServer",
+      "-ThickClientManagedApplication",
+      "-ThickClientServerManagedApplication",
+      "-ConfigLogIntegrity",
+      "-IncorrectReferences",
+      "-HandlersExistence"
+    ]
+  }
+}

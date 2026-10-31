@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "provider": "existing configured Sol subscription",
+  "elapsed_seconds": 25.16,
+  "rounds": 2,
+  "tool_calls": 1,
+  "tokens": 2566,
+  "actual_virtual_table_fields": 15,
+  "resource_field": "СуммаОборот",
+  "periodicity_parameter_confirmed": true,
+  "local_transaction_rolled_back": true,
+  "paid_api_used": false,
+  "reused_from_source_hash": "bddc4dc468cc2e281d2016e62612ecacce4c0e41c02f898f2936b851bcc266f7",
+  "new_executions_on_final_slice": 0
+}

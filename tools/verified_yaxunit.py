@@ -291,6 +291,9 @@ def main():
     require(options.run_folder is not None, '--run-folder is required outside live EDT mode')
     receipt = Receipt(options.run_folder)
     config = json.loads(options.base_config.read_text(encoding='utf-8'))
+    if options.mcp_helper:
+        from edt_yaxunit import Mcp, edt_agent_provider
+        config['_edt_agent_provider'] = edt_agent_provider(Mcp(options.mcp_helper, receipt), config)
     require(public_base(config['connection']) == receipt.spec['target'], 'Wrong configured base')
     selected_filter = registered_test_filter(receipt.spec['tests'])
     # Reuse the established shared base lease, without rewriting runner source.

@@ -62,6 +62,9 @@ def local_expert_fixture():
                                           "prompt_tokens_details": {"cached_tokens": 500}, "cost": 0.222}}
                     self.send_json(200, data)
                     return
+                if scenario.startswith("structure-"):
+                    from structure_fixture import reply
+                    self.send_json(200,reply(payload,scenario,check));return
                 if scenario == "pagination":
                     schema = next(t["function"]["parameters"] for t in tools if t["function"]["name"] == "get_metadata_tree")
                     check({"offset", "limit"} <= set(schema["properties"]), "pagination_schema_advertised")

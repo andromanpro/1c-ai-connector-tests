@@ -1,0 +1,153 @@
+{
+  "schema": 3,
+  "run_id": "20261031T232423Z-38cddfd3baeb",
+  "source_hash": "aa6c2925012b89a7768366dcbc38a38a442f372cc8bc47c3a50657c98200d705",
+  "product_version": "1.9.0",
+  "tests_version": "1.9.0",
+  "artifacts": {
+    "IIkona-1.9.0.cfe": {
+      "sha256": "55056ac4c83ad6e2c2d27a161eab1f48c24bc37e9649911b8d5af4e24ea5d18d",
+      "bytes": 1979886
+    },
+    "IIkona-tests-1.9.0.cfe": {
+      "sha256": "ae729d479afddd52f95c76d7486385a64beeca6be2cf9307d9730ec6487d63ac",
+      "bytes": 272059
+    }
+  },
+  "main": {
+    "passed": 1131,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "contexts": {
+      "Сервер": 1099,
+      "КлиентУправляемоеПриложение": 32
+    },
+    "junit_sha256": "e58af5cb5f1e7ab95fe1609b83c1980724baa3a17d8f8ee9bc32388241bce0b8",
+    "engine": "EDT RuntimeClient",
+    "repeated_cli_context_export": false,
+    "exact_case_names_and_contexts_verified": true
+  },
+  "native_compiler": {
+    "passed": true,
+    "diagnostics": 0,
+    "product_contexts": 7,
+    "target": "Independent pure vendor BSP 3.1.11.466, not demo",
+    "base_cf_sha256": "bdbeab61b6d1da71854584ead54f7c1a335b7ef2fa65e712693be0a898f8791c",
+    "exact_tested_product_cfe": true,
+    "test_extension_new_separate_compilation": false,
+    "test_extension_checked_by": "Real server and managed-client test execution"
+  },
+  "ordinary_roles": {
+    "passed": 78,
+    "profiles": [
+      "a",
+      "b",
+      "viewer"
+    ],
+    "cases_per_profile": 26,
+    "bsp_provisioned": true,
+    "cleanup_complete": true,
+    "system_administration_roles": false,
+    "reused_from_source_hash": "bddc4dc468cc2e281d2016e62612ecacce4c0e41c02f898f2936b851bcc266f7",
+    "new_executions_on_final_slice": 0,
+    "reason": "All role, dialogue, query structure, agent, rights, test and harness files byte-identical. Sole final-slice change replaces an optional BSP background-pause helper with the same native wait; unrelated to these scenarios."
+  },
+  "live_subscription": {
+    "passed": true,
+    "provider": "existing configured Sol subscription",
+    "elapsed_seconds": 25.16,
+    "rounds": 2,
+    "tool_calls": 1,
+    "tokens": 2566,
+    "actual_virtual_table_fields": 15,
+    "resource_field": "СуммаОборот",
+    "periodicity_parameter_confirmed": true,
+    "local_transaction_rolled_back": true,
+    "paid_api_used": false,
+    "reused_from_source_hash": "bddc4dc468cc2e281d2016e62612ecacce4c0e41c02f898f2936b851bcc266f7",
+    "new_executions_on_final_slice": 0
+  },
+  "preservation": {
+    "passed": true,
+    "tables": 29,
+    "all_current_fields": true,
+    "differences": {
+      "data": [],
+      "constants": [],
+      "users": [],
+      "catalog_ids": [],
+      "model_keys": []
+    }
+  },
+  "native_delivery_readback": {
+    "product": {
+      "cfe_sha256": "55056ac4c83ad6e2c2d27a161eab1f48c24bc37e9649911b8d5af4e24ea5d18d",
+      "source_hash": "aa6c2925012b89a7768366dcbc38a38a442f372cc8bc47c3a50657c98200d705",
+      "expected_count": 94,
+      "actual_count": 94,
+      "missing": [],
+      "extra": [],
+      "different": [],
+      "all_bsl_equal": true,
+      "full_edt_import_used": false
+    },
+    "tests": {
+      "source_hash": "aa6c2925012b89a7768366dcbc38a38a442f372cc8bc47c3a50657c98200d705",
+      "cfe_sha256": "ae729d479afddd52f95c76d7486385a64beeca6be2cf9307d9730ec6487d63ac",
+      "expected_count": 36,
+      "actual_count": 36,
+      "all_bsl_equal": true,
+      "missing": [],
+      "extra": [],
+      "different": []
+    },
+    "full_edt_import_used": false
+  },
+  "runtime_before_after_equal": true,
+  "canonical_source": {
+    "passed": true,
+    "manifest_sha256": "0f565e9843e99957cf67e7be6c9e060d9616dbdab2d90375f10d20fc25b47d3d",
+    "product_files": 304,
+    "shared_test_files": 73,
+    "examiner_checked": false
+  },
+  "sonar": {
+    "analysis_id": "AaGUSphDq1oI51Knrc5X",
+    "gate": "OK",
+    "unresolved_issues": 0,
+    "profile_unchanged": true,
+    "rules_or_issue_status_not_changed": true
+  },
+  "readability": {
+    "files": 94,
+    "issues": 0
+  },
+  "harness": {
+    "python_unittests_passed": 182,
+    "invocation": "python -m unittest discover -s tools -p test_*.py",
+    "receipt": "Local full discovery before final03; all mechanism files identical between final02 and final03"
+  },
+  "reused_checks": {
+    "passed": true,
+    "checked_files": 448,
+    "different_files": [
+      "product/CommonModules/КИИ_RAGQdrant/Module.bsl"
+    ],
+    "different_method": "КИИ_RAGQdrant.ПаузаИсполнителя",
+    "reused_from_source_hash": "bddc4dc468cc2e281d2016e62612ecacce4c0e41c02f898f2936b851bcc266f7",
+    "final_source_hash": "aa6c2925012b89a7768366dcbc38a38a442f372cc8bc47c3a50657c98200d705",
+    "roles_new_executions_on_final_slice": 0,
+    "sol_new_executions_on_final_slice": 0,
+    "reason": "All role, dialogue, query structure, agent, rights, test and harness files byte-identical. Sole final-slice change replaces an optional BSP background-pause helper with the same native wait; unrelated to these scenarios."
+  },
+  "verification_limits": [
+    "Boyko UT and IIS environment was not reproduced exactly.",
+    "A genuine PD substitution collision was independently reproduced and fixed; the exact cause of Boyko original refusal is unproven.",
+    "IIS republishing and authentication behavior is documented from official sources, not reproduced locally: IIS is not installed.",
+    "Ordinary-role executions and the real subscription probe ran on slice02; only RAG background-pause method differs in final slice03, with byte-identical relevant sources.",
+    "The native compiler check covers the exact product CFE on pure BSP. No new separate seven-context compiler run of the test extension is claimed.",
+    "Native CFE BSL comparison normalizes BOM/line endings; a second full EDT XML export was not performed.",
+    "All-provider live certification and all target configurations are outside this release verification."
+  ]
+}

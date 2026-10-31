@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checked_files": 448,
+  "different_files": [
+    "product/CommonModules/КИИ_RAGQdrant/Module.bsl"
+  ],
+  "different_method": "КИИ_RAGQdrant.ПаузаИсполнителя",
+  "reused_from_source_hash": "bddc4dc468cc2e281d2016e62612ecacce4c0e41c02f898f2936b851bcc266f7",
+  "final_source_hash": "aa6c2925012b89a7768366dcbc38a38a442f372cc8bc47c3a50657c98200d705",
+  "roles_new_executions_on_final_slice": 0,
+  "sol_new_executions_on_final_slice": 0,
+  "reason": "All role, dialogue, query structure, agent, rights, test and harness files byte-identical. Sole final-slice change replaces an optional BSP background-pause helper with the same native wait; unrelated to these scenarios."
+}

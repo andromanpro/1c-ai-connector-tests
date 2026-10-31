@@ -1,0 +1,10 @@
+{
+  "source_hash": "aa6c2925012b89a7768366dcbc38a38a442f372cc8bc47c3a50657c98200d705",
+  "cfe_sha256": "ae729d479afddd52f95c76d7486385a64beeca6be2cf9307d9730ec6487d63ac",
+  "expected_count": 36,
+  "actual_count": 36,
+  "all_bsl_equal": true,
+  "missing": [],
+  "extra": [],
+  "different": []
+}
