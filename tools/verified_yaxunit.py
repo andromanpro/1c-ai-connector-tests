@@ -53,8 +53,11 @@ def idle(config):
             config.get('rac_address', 'localhost:1545')]
     result = subprocess.run(args, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
     require(result.returncode == 0, 'Cannot verify target sessions')
-    state = check_sessions(result.stdout.decode('utf-8-sig'), config.get('disconnected_session_allowlist', []),
-                           public_base(config['connection']))
+    text=result.stdout.decode('utf-8-sig')
+    provider=config.get('_edt_agent_provider')
+    proofs=provider(text) if provider is not None else ()
+    state = check_sessions(text, config.get('disconnected_session_allowlist', []),
+                           public_base(config['connection']),proofs)
     if state['evidenced_disconnected_sessions']:
         import psutil
         target = public_base(config['connection']).split('/', 1)[1].casefold()
@@ -207,18 +210,29 @@ def fatal_client_log(folder, allow_busy=True, include_debug=False):
 
 
 def wait_for_client(process, folder, timeout_s, request_close, close_grace_s=30,
-                    clock=time.monotonic, sleep=time.sleep):
+                    clock=time.monotonic, sleep=time.sleep, startup_timeout_s=None):
     """Return attention after bounded normal-close grace, without killing the client."""
     started = clock()
     close_at = None
     close_windows = 0
     initialization_error = None
     failure_reason = None
+    execution_observed = False
     notice = started + 45
     while process.poll() is None:
         now = clock()
         if initialization_error is None:
             initialization_error = fatal_client_log(folder)
+        if startup_timeout_s is not None and not execution_observed:
+            from yaxunit_startup_guard import execution_started
+            path = folder / 'yaxunit-debug.log'
+            try:
+                execution_observed = path.exists() and execution_started(path.read_text(encoding='utf-8-sig'))
+            except PermissionError:
+                pass
+            if not execution_observed and now - started >= startup_timeout_s:
+                initialization_error = {'kind': 'test-start-not-observed',
+                                        'test_execution_proven': False}
         if close_at is None and (initialization_error is not None or now - started >= timeout_s):
             failure_reason = initialization_error['kind'] if initialization_error else 'timeout'
             close_at = now
@@ -262,11 +276,19 @@ def retain_live_client(lease, receipt, process, reason):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--run-folder', type=Path, required=True)
+    parser.add_argument('--run-folder', type=Path)
     parser.add_argument('--base-config', type=Path, required=True)
     parser.add_argument('--timeout', type=int, default=600)
+    parser.add_argument('--edt-project')
+    parser.add_argument('--plan', type=Path)
+    parser.add_argument('--output-root', type=Path)
+    parser.add_argument('--mcp-helper', type=Path)
     options = parser.parse_args()
     require(options.timeout > 0, 'Timeout must be positive')
+    if options.edt_project:
+        from edt_yaxunit import run_live_edt
+        return run_live_edt(options)
+    require(options.run_folder is not None, '--run-folder is required outside live EDT mode')
     receipt = Receipt(options.run_folder)
     config = json.loads(options.base_config.read_text(encoding='utf-8'))
     require(public_base(config['connection']) == receipt.spec['target'], 'Wrong configured base')

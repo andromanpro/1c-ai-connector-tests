@@ -22,11 +22,25 @@ def session_rows(text):
     if current is not None:rows.append(current)
     return rows
 
-def check_sessions(text,allowlist,target):
+def check_sessions(text,allowlist,target,edt_agents=()):
     rows=session_rows(text);allowed={x['session']:x for x in allowlist}
     require(len(allowed)==len(allowlist),'Duplicate session exceptions')
-    accepted=[]
+    accepted=[];agents=[]
+    proofs={x['session']:x for x in edt_agents}
+    require(len(proofs)==len(edt_agents),'Duplicate EDT agent evidence')
     for row in rows:
+        if row['session'] in proofs:
+            proof=proofs[row['session']]
+            require(row.get('app-id')=='Designer' and row.get('host')==proof.get('host')
+                    and row.get('connection')!=ZERO and row.get('process')!=ZERO,
+                    'EDT agent session identity differs')
+            require(proof.get('target')==target and proof.get('native_parent_verified') is True
+                    and proof.get('agent_mode') is True and proof.get('matching_target_processes')==1
+                    and isinstance(proof.get('pid'),int) and proof.get('created_at',0)>0,
+                    'EDT agent process was not independently verified')
+            require(row.get('duration-current')=='0' and row.get('current-service-name')=='',
+                    'EDT agent is executing a database operation')
+            agents.append(proof);continue
         identity=row['session'];require(identity in allowed,'Target has an unknown session')
         item=allowed[identity]
         require(row.get('user-name')==item['user'] and row.get('host')==item['host']
@@ -61,4 +75,5 @@ def check_sessions(text,allowlist,target):
         accepted.append({'session':identity,'user':row['user-name'],'host':row['host'],
                          'last_active_at':row['last-active-at'],'connection':ZERO,'process':ZERO,
                          'hibernate':True,'activity':0,'evidence_sha256':item['evidence_sha256']})
-    return {'target':target,'connected_sessions':0,'evidenced_disconnected_sessions':accepted}
+    return {'target':target,'connected_sessions':len(agents),'evidenced_edt_agents':agents,
+            'evidenced_disconnected_sessions':accepted}

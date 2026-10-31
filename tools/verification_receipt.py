@@ -246,6 +246,18 @@ class Receipt:
             require(before['extensions'] == observed, 'Runtime extension policy or identity changed')
         return self.record('runtime-' + stage, {'target': actual_target, 'extensions': observed})
 
+    def live_build(self, project, delivery, artifacts):
+        """Native EDT delivery evidence; deliberately does not claim an offline XML comparison."""
+        require(project and artifacts and set(delivery) == set(artifacts), 'Live delivery scope differs')
+        for name, item in delivery.items():
+            require(item.get('status') == 'updated' and item.get('updated') is True
+                    and item.get('base_project') == project and item.get('extension_project'),
+                    'Native EDT delivery was not confirmed: ' + name)
+        return self.record('build', {'verification_kind': 'native-edt-delivery',
+                                    'base_project': project, 'delivery': delivery,
+                                    'offline_xml_comparison': False,
+                                    'artifacts': {k:digest(Path(v).read_bytes()) for k,v in artifacts.items()}})
+
     def prepare_test(self, configuration):
         require((self.folder / 'runtime-before.json').exists(), 'Runtime was not checked')
         require(not (self.folder / 'junit.xml').exists(), 'JUnit already exists before launch')

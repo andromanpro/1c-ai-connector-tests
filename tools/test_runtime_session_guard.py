@@ -14,6 +14,27 @@ class GuardTests(unittest.TestCase):
     def text(self,row=None):return '\r\n'.join(k+' : '+v for k,v in (row or self.row).items())
     def check(self,text=None):return check_sessions(self.text() if text is None else text,[self.item],self.target)
     def test_empty_target(self):self.assertEqual(check_sessions('',[],self.target)['connected_sessions'],0)
+    def agent(self):
+        row={**self.row,'app-id':'Designer','connection':'connection-id','process':'worker-id','hibernate':'no'}
+        proof={'session':'known','host':'local','target':self.target,'pid':123,'created_at':1,
+               'native_parent_verified':True,'agent_mode':True,'matching_target_processes':1}
+        return row,proof
+    def test_only_evidenced_edt_agent_is_admitted(self):
+        row,proof=self.agent()
+        result=check_sessions(self.text(row),[],self.target,[proof])
+        self.assertEqual(result['evidenced_edt_agents'],[proof])
+    def test_unproved_active_designer_is_refused(self):
+        row,_=self.agent()
+        with self.assertRaises(VerificationError):check_sessions(self.text(row),[],self.target)
+    def test_edt_proof_cannot_admit_a_client_or_another_target(self):
+        row,proof=self.agent()
+        for change in [{'app-id':'1CV8'},{'host':'foreign'},{'duration-current':'1'}]:
+            with self.subTest(change=change),self.assertRaises(VerificationError):
+                check_sessions(self.text({**row,**change}),[],self.target,[proof])
+        for change in [{'target':'server:other'},{'native_parent_verified':False},
+                       {'agent_mode':False},{'matching_target_processes':2},{'created_at':0}]:
+            with self.subTest(change=change),self.assertRaises(VerificationError):
+                check_sessions(self.text(row),[],self.target,[{**proof,**change}])
     def test_evidenced_inactive_target(self):self.assertEqual(len(self.check()['evidenced_disconnected_sessions']),1)
     def test_unknown_disconnected(self):
         with self.assertRaises(VerificationError):check_sessions(self.text(),[],self.target)

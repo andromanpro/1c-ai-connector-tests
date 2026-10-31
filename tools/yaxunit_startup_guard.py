@@ -28,3 +28,8 @@ def startup_failure(text):
                                       or 'Нарушение прав доступа!' in diagnostic)
                     else 'initialization-error',
             'test_execution_proven': False, 'diagnostic': diagnostic}
+
+
+def execution_started(text):
+    """A product window or empty log is not evidence of a running YAxUnit engine."""
+    return bool(re.search(r'\[(?:Клиент|Сервер)\]\[INF\]:\s*Загрузка тестовых сценариев', text))

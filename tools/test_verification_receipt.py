@@ -151,6 +151,21 @@ class ReceiptTest(unittest.TestCase):
         self.extensions['product']['active'] = False
         with self.assertRaises(VerificationError): self.receipt.runtime('before', 'server/isolated', self.extensions)
 
+    def test_live_edt_delivery_does_not_require_or_claim_xml_export(self):
+        delivery={'product':{'status':'updated','updated':True,'base_project':'Base','extension_project':'Base.Product'}}
+        result=self.receipt.live_build('Base',delivery,{'product':self.cfe})
+        self.assertEqual(result['verification_kind'],'native-edt-delivery')
+        self.assertFalse(result['offline_xml_comparison'])
+        self.assertNotIn('xml',result)
+        self.receipt.runtime('before','server/isolated',self.extensions)
+
+    def test_scheduled_failed_and_wrong_parent_delivery_are_refused(self):
+        for change in [{'status':'scheduled','updated':False},{'updated':False},{'base_project':'Wrong'}]:
+            item=dict(status='updated',updated=True,base_project='Base',extension_project='Base.Product',**{})
+            item.update(change)
+            with self.subTest(change=change),self.assertRaises(VerificationError):
+                self.receipt.live_build('Base',{'product':item},{'product':self.cfe})
+
     def test_xml_mismatch(self):
         other = self.root / 'other'
         other.mkdir()
