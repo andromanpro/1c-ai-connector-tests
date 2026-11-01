@@ -1,0 +1,19 @@
+{
+  "gate": "OK",
+  "open_count": 0,
+  "open_issues": [],
+  "rules_or_issue_status_not_changed": true,
+  "profile_unchanged": true,
+  "source_comparison": {
+    "cfe_sha256": "9d8c6ab91305f6099d8f9ecb4ab37917cb4eef549f54aff7cae9433c1ca473b0",
+    "source_hash": "21b4b6e7e92d63f74695ef672e8b8e805a4d37d7f96e52c12c355859ff2f9cbe",
+    "expected_count": 94,
+    "actual_count": 94,
+    "missing": [],
+    "extra": [],
+    "different": [],
+    "all_bsl_equal": true,
+    "full_edt_import_used": false
+  },
+  "analysis_id": "AaGXxNZnq1oI51Knrmwq"
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "path": "CommonModules/КИИ_ХранениеДиалогов/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "DataProcessors/КИИ_ТестИИ/Forms/Диалоги/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "DataProcessors/КИИ_ТестИИ/Forms/Форма/Module.bsl",
+    "exit_code": 0
+  }
+]

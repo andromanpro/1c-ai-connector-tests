@@ -73,7 +73,7 @@ def remove_actor_dialogues(suite, records, before):
     require(register_snapshot(suite.base) == before, 'Dialogue register baseline was not restored')
 
 
-def main():
+def _legacy_com_probe():
     sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -169,6 +169,9 @@ def main():
                 'complete': lambda: foreign_api.СохранитьИтогЗапроса(first, request, None, 'Forbidden completion'),
                 'startup': lambda: foreign_api.ЗаписатьСостояниеЗапуска(first, request, None, True),
                 'refresh_source': lambda: foreign_api.ОбновитьИсточник(first, material),
+                'delete': lambda: foreign_api.УдалитьДиалог(first, 1),
+                'delete_many': lambda: foreign_api.УдалитьДиалоги(
+                    array(base, [structure(base, Диалог=first, Версия=1)])),
             }
             for name, call in calls.items():
                 denied(kind + '.foreign.' + name, call, 'Диалог недоступен текущему пользователю')
@@ -178,6 +181,11 @@ def main():
                        lambda name=name: query(base, 'ВЫБРАТЬ Данные.* ИЗ РегистрСведений.' + name + ' КАК Данные'),
                        'прав')
         denied('b.import_foreign_attachment', lambda: b.КИИ_ХранениеДиалогов.ДобавитьИсточник(foreign, structure(b, Диалог=first, Материал=material)), 'Диалог недоступен текущему пользователю')
+        mixed = array(b, [structure(b, Диалог=foreign, Версия=1), structure(b, Диалог=first, Версия=1)])
+        denied('b.mixed_delete_preserves_own', lambda: b.КИИ_ХранениеДиалогов.УдалитьДиалоги(mixed),
+               'Диалог недоступен текущему пользователю')
+        check('b.own_survives_mixed_delete', b.КИИ_ХранениеДиалогов.ДиалогДоступен(foreign))
+        check('b.privilege_restored.mixed_delete', not b.ПривилегированныйРежим())
         check('a.not_modified_by_foreign_probes', api.Диалог(first).Черновик == expected_draft and api.СообщенияДиалога(first).Количество() == 2)
         result['probes_passed'] = True
         save()
@@ -185,7 +193,7 @@ def main():
         result['error'] = str(error).replace('123456', '[test-password]')
         save()
     finally:
-        api = foreign_api = base = a = b = viewer = own = saved = settings = payload = prepared = answer = connector = None
+        api = foreign_api = base = a = b = viewer = own = saved = settings = payload = prepared = answer = connector = mixed = None
         clients.clear()
         gc.collect()
         try:
@@ -215,6 +223,12 @@ def main():
                       'cleanup_complete': result['cleanup_complete'], 'error': result.get('error'),
                       'cleanup_error': result.get('cleanup_error')}, ensure_ascii=False))
     return 0 if result['passed'] else 1
+
+
+def main():
+    """Use managed-client checks; restricted COM startup is not a valid BSP probe."""
+    from run_saved_dialog_rights import main as run_native_rights
+    return run_native_rights()
 
 
 if __name__ == '__main__': raise SystemExit(main())

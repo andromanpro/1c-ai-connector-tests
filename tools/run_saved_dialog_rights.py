@@ -14,6 +14,59 @@ from verification_receipt import Receipt, require
 from run_bsp_journal_rights import structure
 
 MODULE = 'Тесты_КИИ_ХранениеДиалогов'
+LIMITED_CASES = frozenset('''БинарныйФайлИсторииНеПересылаетсяНеявно
+ВИсторииСохраняетсяТекстДляЧеловека
+ВложенияИсторииУчитываютНастройки
+ВыключенноеВложениеОстаетсяВЧерновике
+ГрупповоеУдалениеОтклоняетПовторДиалога
+ГрупповоеУдалениеПроверяетВсеВерсииДоЗаписи
+ГрупповоеУдалениеСохраняетНаборПриАктивномЗапросе
+ИзменениеМатериаловОтменяетСтарыйСнимок
+ИсторияЧитаетсяПорциями
+КонтекстОграниченнойРоли
+НазваниеИзВопросаСохраняетИсходныйТекст
+НазванияБеседОднострочные
+НезавершенныйЗапросЗащищаетОтУдаления
+НеизвестныйРезультатНеРазрешаетПовтор
+НеизменныйЧерновикСохраняетВерсиюСнимка
+ОдинАктивныйЗапросВБеседе
+ОтветыДвухБеседНеСмешиваются
+ОшибкаЗапросаСохраняетсяБезДублей
+ПакетЗапросаНеМеняетсяСЧерновиком
+ПовторныйИсточникНеДублируетКонтекст
+ПрямоеЧтениеХранилищаЗапрещено
+РазныеБеседыХранятСвоиЧерновики
+РезультатСохраняетсяБезФормыИДублей
+СвязанныйФайлЗащищаетИсходнуюБеседу
+ТекстФайлаСохраняетсяВКонтекстеПродолжения
+УдалениеОтклоняетУстаревшееПодтверждение
+УдалениеСохраняетДругуюБеседу
+УдаленнаяБеседаНеВозрождаетсяСЧерновиком
+УстаревшаяВерсияНеЗатираетЧерновик
+ФайлДоступенПослеПовторногоЧтения
+ФайлДругойБеседыНеТребуетПовторнойЗагрузки
+ЦитатаСохраняетсяВКонтекстеПродолжения
+ЧужаяОперацияСохраняетВнешнююТранзакцию
+ЧужиеОперацииОграниченнойРолиЗапрещены'''.splitlines())
+# These tests prepare foreign rows or inspect raw registers as an administrator.
+ADMIN_CASES = frozenset(['ИсполнительОбращаетсяКМоделиБезПривилегии',
+    'ЧужаяБеседаИМатериалЗапрещены', 'КонтекстДругойБеседыСодержитСнимок',
+    'УдалениеУбираетВсеДанныеБеседы', 'ГрупповоеУдалениеСохраняетНевыбраннуюБеседу',
+    'ГрупповоеУдалениеНеОбходитЧужогоВладельца', 'ЧужаяБеседаЗащищенаОтУдаления'])
+ROLE_PROBES = ['КонтекстОграниченнойРоли', 'ЧужиеОперацииОграниченнойРолиЗапрещены',
+              'ПрямоеЧтениеХранилищаЗапрещено', 'ЧужаяОперацияСохраняетВнешнююТранзакцию']
+
+
+def select_role_cases(plan):
+    cases = [name for name in plan['tests'] if name.startswith(MODULE + '.')]
+    require(len(cases) == len(set(cases)), 'Duplicate role selection')
+    for name in cases:
+        short = name.removeprefix(MODULE + '.')
+        require(short in LIMITED_CASES or short in ADMIN_CASES, 'Unclassified role case: ' + name)
+        require(plan['test_contexts'].get(name) == 'Сервер', 'Wrong role case context: ' + name)
+    methods = [name for name in cases if name.removeprefix(MODULE + '.') in LIMITED_CASES]
+    require(methods, 'No selected limited-role cases')
+    return list(dict.fromkeys(methods + [MODULE + '.' + name for name in ROLE_PROBES]))
 
 
 def main():
@@ -23,18 +76,16 @@ def main():
     parser.add_argument('--plan', type=Path, required=True)
     parser.add_argument('--delivery-job', nargs=2, action='append', required=True, metavar=('EXTENSION', 'JOB'))
     options = parser.parse_args()
+    plan = json.loads(options.plan.read_text(encoding='utf-8'))
+    methods = select_role_cases(plan)
     options.output.mkdir(parents=True, exist_ok=False)
     actors.O = options.output
     evidence = Evidence(options.output)
+    evidence.record('role-selection', {'tests': methods,
+        'excluded_administrator_cases': [name for name in plan['tests']
+            if name.startswith(MODULE + '.') and name.removeprefix(MODULE + '.') in ADMIN_CASES]})
     mcp = Mcp(options.mcp_helper, evidence)
     actors.C['_edt_agent_provider'] = edt_agent_provider(mcp, actors.C)
-    plan = json.loads(options.plan.read_text(encoding='utf-8'))
-    methods = [x for x in plan['tests'] if x.startswith(MODULE + '.') and not x.endswith((
-        '.ИсполнительОбращаетсяКМоделиБезПривилегии', '.ЧужаяБеседаИМатериалЗапрещены',
-        '.КонтекстДругойБеседыСодержитСнимок'))]
-    methods += [MODULE + '.' + x for x in ['КонтекстОграниченнойРоли',
-        'ЧужиеОперацииОграниченнойРолиЗапрещены', 'ПрямоеЧтениеХранилищаЗапрещено',
-        'ЧужаяОперацияСохраняетВнешнююТранзакцию']]
     result = {'passed': False, 'cleanup_complete': False, 'runs': []}
     suite = actors.Actors()
     records = {}

@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "cleanup_complete": true,
+  "actor": {
+    "name": "K09_bsp_755c30acd7_forms",
+    "ib_uid": "c6d3f4a9-de86-4cad-8ee6-743eba556d0b",
+    "catalog_uid": "6e9e4afd-8dcf-4b46-a81e-a98cdedb08c8",
+    "group_uid": "2ba9474b-9280-4ffe-89b9-bd6b22d9e492",
+    "profile_uid": "70df58bc-11b1-478a-8c9f-0c09bf0aea6a",
+    "roles": [
+      "_ДемоБазовыеПраваБСП",
+      "БазовыеПраваБСП",
+      "ЗапускВнешнегоСоединения",
+      "ЗапускТолстогоКлиента",
+      "ЗапускТонкогоКлиента",
+      "ИнтерактивноеОткрытиеВнешнихОтчетовИОбработок",
+      "КИИ_БазовыеПрава",
+      "СохранениеДанныхПользователя"
+    ],
+    "requested_roles": [
+      "БазовыеПраваБСП",
+      "_ДемоБазовыеПраваБСП",
+      "ЗапускТолстогоКлиента",
+      "ЗапускТонкогоКлиента",
+      "ЗапускВнешнегоСоединения",
+      "КИИ_БазовыеПрава",
+      "СохранениеДанныхПользователя",
+      "ИнтерактивноеОткрытиеВнешнихОтчетовИОбработок"
+    ],
+    "creation": "Catalog.Пользователи + ОписаниеПользователяИБ",
+    "rights": "Catalog.ПрофилиГруппДоступа + Catalog.ГруппыДоступа + УправлениеДоступом.ОбновитьРолиПользователей"
+  },
+  "two_independent_drafts": true,
+  "closed_dialogue_draft_restored": true,
+  "multi_deletion": {
+    "selected": 2,
+    "cancel_preserved_both": true,
+    "one_confirmation_deleted_both": true,
+    "open_dialogues_closed": true,
+    "native_selection_committed": true,
+    "native_error_with_reason": true,
+    "refusal_preserved_both_dialogues": true
+  }
+}
