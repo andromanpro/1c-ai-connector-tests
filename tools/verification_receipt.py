@@ -205,10 +205,19 @@ class Receipt:
     def record(self, name, data):
         self.unchanged()
         require(name.replace('-', '').replace('_', '').isalnum(), 'Invalid evidence name')
+        require(not {'run_id', 'source_hash'} & set(data), 'Evidence cannot override receipt identity')
         path = self.folder / (name + '.json')
-        with path.open('x', encoding='utf-8') as stream:
-            json.dump(dict(run_id=self.spec['run_id'], source_hash=self.spec['source_hash'], **data),
-                      stream, ensure_ascii=False, indent=2)
+        payload = json.dumps(dict(run_id=self.spec['run_id'], source_hash=self.spec['source_hash'], **data),
+                             ensure_ascii=False, indent=2)
+        if path.exists():
+            raise FileExistsError(path)
+        temporary = path.with_name(path.name + '.' + uuid.uuid4().hex + '.tmp')
+        try:
+            with temporary.open('x', encoding='utf-8') as stream:
+                stream.write(payload)
+            temporary.rename(path)
+        finally:
+            temporary.unlink(missing_ok=True)
         return data
 
     def build(self, expected_xml, installed_xml, artifacts):

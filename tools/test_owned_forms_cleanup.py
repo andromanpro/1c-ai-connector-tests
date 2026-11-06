@@ -91,5 +91,42 @@ class ClosedReviewCleanup(unittest.TestCase):
             self.check([self.row, self.row])
 
 
+class FailedLaunchOwnership(unittest.TestCase):
+    def test_failed_launch_keeps_its_isolated_process(self):
+        from owned_forms_cleanup import failed_launch_result
+        value = {'ok': False, 'pid': 123, 'desktop': 'isolated', 'client_stopped': True}
+        self.assertEqual(failed_launch_result('launch_client', value), value)
+
+    def test_other_actions_or_missing_process_do_not_create_ownership(self):
+        from owned_forms_cleanup import failed_launch_result
+        for action, value in [('other', {'ok': False, 'pid': 123}),
+                              ('launch_client', {'ok': False}),
+                              ('launch_client', {'ok': False, 'pid': True}),
+                              ('launch_client', {'ok': False, 'pid': -1})]:
+            with self.subTest(action=action, value=value):
+                self.assertIsNone(failed_launch_result(action, value))
+
+    def test_saved_timeout_can_recover_without_successful_launch_file(self):
+        from owned_forms_cleanup import saved_launch
+        from pathlib import Path
+        import tempfile, json
+        with tempfile.TemporaryDirectory() as folder:
+            run = Path(folder)
+            value = {'ok': False, 'pid': 123, 'desktop': 'isolated', 'client_stopped': True}
+            (run/'result.json').write_text(json.dumps({'error_type': 'ActionError',
+                'error': 'launch_client: Test-client startup deadline expired.'}), encoding='utf-8')
+            (run/'action-error.json').write_text(json.dumps(value), encoding='utf-8')
+            self.assertEqual(saved_launch(run), value)
+            (run/'result.json').write_text(json.dumps({'error_type': 'ActionError',
+                'error': 'other_action: failed'}), encoding='utf-8')
+            with self.assertRaises(RuntimeError):
+                saved_launch(run)
+
+    def test_visible_desktop_is_not_accepted_for_failed_launch_cleanup(self):
+        from owned_forms_cleanup import failed_launch_result
+        with self.assertRaises(RuntimeError):
+            failed_launch_result('launch_client', {'ok': False, 'pid': 123, 'desktop': 'default'})
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

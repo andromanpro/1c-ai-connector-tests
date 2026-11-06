@@ -1,0 +1,150 @@
+[
+  {
+    "path": "CommonModules/КИИ_HTTPКлиент/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_RAG/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_RAGQdrant/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_АгентАнализа/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_АудиторКода/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_ИнтерфейсКлиент/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_КоннекторAnthropic/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_КоннекторGoogle/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_КоннекторOpenAI/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_КоннекторИИ/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_КоннекторИИОбщий/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_КонтекстДиалога/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_КонтрольПерсональныхДанных/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_МаркдаунПарсерКлиентСервер/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_МониторингОшибок/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_МониторингОшибокЖР/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_МониторингОшибокКлиент/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_МониторингОшибокРегистры/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_ОчередьQdrant/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_ПодключенияКБазам/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_ПроверкаПоискаКлиент/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_СерверMCPАудит/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_СерверMCPИнструментДеревоМетаданных/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_СерверMCPИнструментДиаграмма/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_СерверMCPИнструментСтруктураОбъекта/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_СерверMCPОграничения/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_СерверMCPРеестр/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "CommonModules/КИИ_ХранениеДиалогов/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "DataProcessors/КИИ_ГенераторДиаграмм/Forms/Форма/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "DataProcessors/КИИ_ГенераторДиаграмм/ObjectModule.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "DataProcessors/КИИ_ТестИИ/Forms/Диалоги/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "DataProcessors/КИИ_ТестИИ/Forms/Форма/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "HTTPServices/КИИ_СерверMCPAPI/Module.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "InformationRegisters/КИИ_МониторингОшибокЖурнал/ManagerModule.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "InformationRegisters/КИИ_МониторингОшибокЖурнал/RecordSetModule.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "InformationRegisters/КИИ_МониторингОшибокСтатистика/ManagerModule.bsl",
+    "exit_code": 0
+  },
+  {
+    "path": "InformationRegisters/КИИ_МониторингОшибокСтатистика/RecordSetModule.bsl",
+    "exit_code": 0
+  }
+]

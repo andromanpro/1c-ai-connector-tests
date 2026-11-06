@@ -48,6 +48,8 @@ def designer_authentication(connection):
 
 def idle(config):
     from runtime_session_guard import check_sessions
+    from ras_runtime import ensure_ras
+    ensure_ras(config)
     args = [str(Path(config['platform_bin']) / 'rac.exe'), 'session', 'list',
             '--cluster=' + config['cluster'], '--infobase=' + config['infobase'],
             config.get('rac_address', 'localhost:1545')]

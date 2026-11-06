@@ -26,6 +26,23 @@ class ReceiptTest(unittest.TestCase):
     def build(self):
         self.receipt.build({'product': self.xml}, {'product': self.xml}, {'product': self.cfe})
 
+    def test_reserved_identity_does_not_create_an_empty_receipt(self):
+        for key in ('run_id', 'source_hash'):
+            with self.subTest(key=key), self.assertRaises(VerificationError):
+                self.receipt.record('invalid-' + key, {key: 'replacement'})
+            self.assertFalse((self.receipt.folder / ('invalid-' + key + '.json')).exists())
+
+    def test_nonserializable_evidence_does_not_create_an_empty_receipt(self):
+        with self.assertRaises(TypeError):
+            self.receipt.record('bad-json', {'value': object()})
+        self.assertFalse((self.receipt.folder / 'bad-json.json').exists())
+
+    def test_existing_evidence_is_never_replaced(self):
+        original = (self.receipt.folder / 'edt-export.json').read_bytes()
+        with self.assertRaises(FileExistsError):
+            self.receipt.record('edt-export', {'other': True})
+        self.assertEqual((self.receipt.folder / 'edt-export.json').read_bytes(), original)
+
     def started(self):
         self.build()
         self.receipt.runtime('before', 'server/isolated', self.extensions)

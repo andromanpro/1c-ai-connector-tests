@@ -15,7 +15,7 @@ from testpilot import Client, ActionError
 import bsp_test_users as actors
 from check_saved_dialog_access import BASE_ROLES, Evidence, register_snapshot, remove_actor_dialogues
 from edt_yaxunit import Mcp, edt_agent_provider
-from owned_forms_cleanup import cleanup as cleanup_owned_forms_session
+from owned_forms_cleanup import cleanup as cleanup_owned_forms_session, failed_launch_result
 
 
 def capture_screenshot(client):
@@ -27,6 +27,18 @@ def capture_screenshot(client):
             if error.code != 'screenshot_window_changed' or attempt == 3:
                 raise
             time.sleep(0.2)
+
+
+def exercise_application_exit(client, evidence):
+    """Require graceful application exit while a real dialogue form is still open."""
+    context = client.get_context(result_mode='full', include_tables=True)
+    evidence.record('application-exit-before', context)
+    assert context['form']['form_name'] == 'Обработка.КИИ_ТестИИ.Форма.Форма', 'Dialogue must remain open on exit'
+    stopped = client.stop_client(graceful_timeout=30)
+    evidence.record('application-exit-result', stopped)
+    assert stopped.get('ok') is True and stopped.get('shutdown') == 'graceful', \
+        'Application did not close gracefully with an open dialogue: ' + str(stopped)
+    return {'dialogue_open_on_exit': True, 'shutdown': stopped['shutdown']}
 
 
 def exercise_dialogue_deletion(client, options, evidence):
@@ -177,6 +189,7 @@ def main():
     parser.add_argument('--exercise', action='store_true')
     parser.add_argument('--exercise-deletion', action='store_true')
     parser.add_argument('--exercise-multi-deletion', action='store_true')
+    parser.add_argument('--exercise-application-exit', action='store_true')
     parser.add_argument('--form-scale', type=int)
     options = parser.parse_args()
     if options.form_scale is not None and (not options.helper or not 50 <= options.form_scale <= 200):
@@ -187,6 +200,10 @@ def main():
         parser.error('--exercise-multi-deletion requires --helper and --exercise')
     if options.exercise_deletion and options.exercise_multi_deletion:
         parser.error('Single and multi deletion fixtures must run separately')
+    if options.exercise_application_exit and not (options.helper and options.exercise):
+        parser.error('--exercise-application-exit requires --helper and --exercise')
+    if options.exercise_application_exit and (options.exercise_deletion or options.exercise_multi_deletion):
+        parser.error('Application-exit verification requires an open dialogue, without deletion')
     options.output.mkdir(parents=True, exist_ok=False)
     actors.O = options.output
     evidence = Evidence(options.output)
@@ -232,7 +249,7 @@ def main():
                 user=actor['name'], password='123456',
                 exe=str(Path(actors.C['platform_bin']) / '1cv8c.exe'),
                 version='8.3.27.1989', desktop='isolated',
-                extra_args=['/RunModeManagedApplication'], wait=150,
+                extra_args=['/RunModeManagedApplication', '/Out', str(options.output/'platform.log')], wait=150,
                 code_epf='F:/WorkAI/tools/1c-testpilot/onec/Testpilot/Testpilot.epf' if options.helper else '')
             evidence.record('launch', launched)
             client.wait_until('Wait for the first application window',
@@ -286,8 +303,14 @@ def main():
                 result['deletion'] = exercise_dialogue_deletion(client, options, evidence)
             if options.exercise_multi_deletion:
                 result['multi_deletion'] = exercise_multiple_dialogue_deletion(client, options, evidence)
+            if options.exercise_application_exit:
+                result['application_exit'] = exercise_application_exit(client, evidence)
             result['passed'] = True
     except Exception as error:
+        if launched is None:
+            launched = failed_launch_result(getattr(error, 'action', None), getattr(error, 'result', None))
+            if launched is not None:
+                evidence.record('launch', launched)
         result['error'] = str(error).replace('123456', '[test-password]')
         result['error_type'] = type(error).__name__
         result['traceback'] = traceback.format_exc().replace('123456', '[test-password]')

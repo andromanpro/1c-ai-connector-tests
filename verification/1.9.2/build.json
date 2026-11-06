@@ -1,0 +1,29 @@
+{
+  "run_id": "20261106T171313Z-776161123f64",
+  "source_hash": "4bdb0bbb927aae8fc020d887ebb78b7511001ca0a0c6c1e959175f6133719624",
+  "verification_kind": "native-edt-delivery",
+  "base_project": "ИИКона_разработки",
+  "delivery": {
+    "ИИКона": {
+      "status": "updated",
+      "extension_project": "ИИКона_разработки.ИИКона",
+      "base_project": "ИИКона_разработки",
+      "target_binding": "baf084d3849f92af449fb536a736abea6c7247427e32a54dd79a7f5bfa34cb65",
+      "engine": "EDT.reloadInfobase",
+      "updated": true
+    },
+    "Тесты": {
+      "status": "updated",
+      "extension_project": "ИИКона_разработки.Тесты",
+      "base_project": "ИИКона_разработки",
+      "target_binding": "baf084d3849f92af449fb536a736abea6c7247427e32a54dd79a7f5bfa34cb65",
+      "engine": "EDT.reloadInfobase",
+      "updated": true
+    }
+  },
+  "offline_xml_comparison": false,
+  "artifacts": {
+    "ИИКона": "0819823ddfff96cd597ad079306a568bd883e816d4a22d62aae0ec47bc369527",
+    "Тесты": "f06098d2c27638d6016eef4bf61dcde7efe08016ff358f8922c7649d5defc5ef"
+  }
+}

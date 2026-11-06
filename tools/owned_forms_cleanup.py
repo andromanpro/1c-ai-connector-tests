@@ -9,6 +9,30 @@ from runtime_session_guard import session_rows, ZERO, ACTIVITY
 from verification_receipt import require
 
 
+def failed_launch_result(action, result):
+    """Keep ownership from a failed launch so its dormant session can be retired."""
+    if action != 'launch_client' or not isinstance(result, dict) or result.get('ok') is not False:
+        return None
+    if type(result.get('pid')) is not int or result['pid'] <= 0:
+        return None
+    require(result.get('desktop') == 'isolated', 'Failed launch was not the isolated test client')
+    return dict(result)
+
+
+def saved_launch(run):
+    launch_path = run / 'launch.json'
+    if launch_path.exists():
+        return json.loads(launch_path.read_text(encoding='utf-8'))
+    outcome = json.loads((run / 'result.json').read_text(encoding='utf-8'))
+    require(outcome.get('error_type') == 'ActionError'
+            and outcome.get('error', '').startswith('launch_client:'),
+            'No proven failed launch in the saved outcome')
+    result = json.loads((run / 'action-error.json').read_text(encoding='utf-8'))
+    launched = failed_launch_result('launch_client', result)
+    require(launched is not None, 'Failed launch has no process ownership')
+    return launched
+
+
 def candidate(rows, actor, launched, baseline, infobase, hostname, pid_alive):
     require(type(launched.get('pid')) is int and not pid_alive, 'Owned UI client is still running or unknown')
     require(actor['ib_uid'] not in {u['uid'] for u in baseline['ib_users'].values()}, 'Actor existed before this UI run')
@@ -140,7 +164,7 @@ def main():
     actor = original['actor']
     baseline = json.loads((options.run / 'baseline.json').read_text(encoding='utf-8'))
     before = json.loads((options.run / 'baseline-dialogues.json').read_text(encoding='utf-8'))
-    launched = json.loads((options.run / 'launch.json').read_text(encoding='utf-8'))
+    launched = saved_launch(options.run)
     prefix = actor['name'].removesuffix('_forms')
     actor_evidence = json.loads((options.run / (prefix + '.json')).read_text(encoding='utf-8'))
     require(actor_evidence['actors']['forms'] == actor, 'Saved actor provenance differs')
