@@ -1,0 +1,10 @@
+Owned client retained without window control: timeout
+Requested normal close of owned client: global-error-loop windows: 0
+Requested normal close of owned client: timeout windows: 1
+Owned client retained without window control: timeout
+Requested normal close of owned client: test-start-not-observed windows: 0
+..................................................................................................................................................................................................................................................................
+----------------------------------------------------------------------
+Ran 258 tests in 5.740s
+
+OK

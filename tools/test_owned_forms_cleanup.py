@@ -128,5 +128,52 @@ class FailedLaunchOwnership(unittest.TestCase):
             failed_launch_result('launch_client', {'ok': False, 'pid': 123, 'desktop': 'default'})
 
 
+class InterruptedProbeOwnership(unittest.TestCase):
+    def test_completed_probe_keeps_its_recorded_actor(self):
+        from owned_forms_cleanup import saved_actor
+        from pathlib import Path
+        import tempfile, json
+        with tempfile.TemporaryDirectory() as folder:
+            run = Path(folder)
+            actor = {'name': 'K09_bsp_example_forms', 'ib_uid': 'owned-user'}
+            (run / 'result.json').write_text(json.dumps({'actor': actor}), encoding='utf-8')
+            self.assertEqual(saved_actor(run), actor)
+
+    def test_interrupted_probe_uses_the_single_saved_actor_manifest(self):
+        from owned_forms_cleanup import saved_actor
+        from pathlib import Path
+        import tempfile, json
+        with tempfile.TemporaryDirectory() as folder:
+            run = Path(folder)
+            actor = {'name': 'K09_bsp_example_forms', 'ib_uid': 'owned-user'}
+            origin = {'prefix': 'K09_bsp_example', 'actors': {'forms': actor}}
+            (run / 'K09_bsp_example.json').write_text(json.dumps(origin), encoding='utf-8')
+            self.assertEqual(saved_actor(run), actor)
+
+    def test_interrupted_probe_refuses_missing_ambiguous_or_mismatched_origin(self):
+        from owned_forms_cleanup import saved_actor
+        from pathlib import Path
+        import tempfile, json
+        with tempfile.TemporaryDirectory() as folder:
+            run = Path(folder)
+            with self.assertRaises(RuntimeError):
+                saved_actor(run)
+            actor = {'name': 'K09_bsp_example_forms', 'ib_uid': 'owned-user'}
+            origin = {'prefix': 'K09_bsp_example', 'actors': {'forms': actor}}
+            first = run / 'K09_bsp_example.json'
+            first.write_text(json.dumps(origin), encoding='utf-8')
+            second = run / 'K09_bsp_other.json'
+            second.write_text(json.dumps(origin), encoding='utf-8')
+            with self.assertRaises(RuntimeError):
+                saved_actor(run)
+            second.unlink()
+            for changed in [dict(origin, prefix='K09_bsp_other'),
+                            dict(origin, actors={}),
+                            dict(origin, actors={'forms': dict(actor, name='existing-user')})]:
+                first.write_text(json.dumps(changed), encoding='utf-8')
+                with self.subTest(origin=changed), self.assertRaises(RuntimeError):
+                    saved_actor(run)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

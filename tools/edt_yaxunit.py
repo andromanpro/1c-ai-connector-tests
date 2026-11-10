@@ -191,6 +191,8 @@ def run_live_edt(options):
     require(options.plan and options.output_root,'Live EDT requires --plan and --output-root')
     plan=json.loads(options.plan.read_text(encoding='utf-8'))
     config=json.loads(options.base_config.read_text(encoding='utf-8'))
+    require(config.get('clear_cache', False) is False,
+            'clear_cache is supported only by the managed CLI runner')
     arguments=runner_arguments(options.edt_project,plan,options.timeout)
     receipt=Receipt.begin(options.output_root,plan['roots'],
                           verified.public_base(config['connection']),plan['tests'],plan['test_contexts'])

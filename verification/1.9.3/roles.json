@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "cleanup_complete": true,
+  "runs": [
+    {
+      "actor": "a",
+      "folder": "F:\\WorkAI\\ИИконаДокументы\\Поставки\\1.9.3\\roles-final\\receipts\\20261110T003511Z-e678f4b1d2a2",
+      "exit_code": 0,
+      "junit": {
+        "run_id": "20261110T003511Z-e678f4b1d2a2",
+        "source_hash": "fa02b3d4578c7239f5eb152431a49e35942aacdfad3e27b8b50a60f177b8d5c6",
+        "sha256": "41554239ccdaa22987add2bffc39c97dde42b69a3bcc669f101da1acfccba7f9",
+        "total": 34,
+        "exit_code": 0,
+        "passed": true
+      }
+    },
+    {
+      "actor": "b",
+      "folder": "F:\\WorkAI\\ИИконаДокументы\\Поставки\\1.9.3\\roles-final\\receipts\\20261110T003615Z-afe61ee2328d",
+      "exit_code": 0,
+      "junit": {
+        "run_id": "20261110T003615Z-afe61ee2328d",
+        "source_hash": "fa02b3d4578c7239f5eb152431a49e35942aacdfad3e27b8b50a60f177b8d5c6",
+        "sha256": "a159d83047908d6c93cb387a79f7660614bca0544f8b97c2efca33a7babf0992",
+        "total": 34,
+        "exit_code": 0,
+        "passed": true
+      }
+    },
+    {
+      "actor": "viewer",
+      "folder": "F:\\WorkAI\\ИИконаДокументы\\Поставки\\1.9.3\\roles-final\\receipts\\20261110T003719Z-8be9e46b4e3c",
+      "exit_code": 0,
+      "junit": {
+        "run_id": "20261110T003719Z-8be9e46b4e3c",
+        "source_hash": "fa02b3d4578c7239f5eb152431a49e35942aacdfad3e27b8b50a60f177b8d5c6",
+        "sha256": "6e01e33df5d5a3134b4f60e4bd4c9abaf7fb768c34bf527dfc1ebfb55de7fcb0",
+        "total": 34,
+        "exit_code": 0,
+        "passed": true
+      }
+    }
+  ]
+}

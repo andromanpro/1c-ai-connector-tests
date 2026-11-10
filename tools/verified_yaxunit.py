@@ -162,12 +162,15 @@ def bsp_provisioning(base, config):
 
 def client_arguments(config, configuration, platform_log):
     require(config.get('run_mode', 'managed') == 'managed', 'Only managed application mode is authorized')
+    clear_cache = config.get('clear_cache', False)
+    require(isinstance(clear_cache, bool), 'clear_cache must be an explicit boolean')
+    cache_arguments = ['/ClearCache'] if clear_cache else []
     auth_args = []
     if config.get('username'):
         require(config.get('user_provisioning') == 'BSP', 'Named test users must be provisioned through BSP')
         auth_args = ['/N' + config['username'], '/P' + config.get('password', '')]
     result = [str(Path(config['platform_bin']) / '1cv8.exe'), 'ENTERPRISE', launch_argument(config['connection']),
-              *auth_args, '/RunModeManagedApplication',
+              *auth_args, *cache_arguments, '/RunModeManagedApplication',
               '/DisableStartupDialogs', '/DisableStartupMessages', '/Out', str(platform_log),
               '/C', 'RunUnitTests=' + str(configuration), '/WA-']
     require('/RunModeManagedApplication' in result and '/RunModeOrdinaryApplication' not in result,
@@ -217,6 +220,7 @@ def wait_for_client(process, folder, timeout_s, request_close, close_grace_s=30,
     started = clock()
     close_at = None
     close_windows = 0
+    normal_close_requested = False
     initialization_error = None
     failure_reason = None
     execution_observed = False
@@ -238,12 +242,16 @@ def wait_for_client(process, folder, timeout_s, request_close, close_grace_s=30,
         if close_at is None and (initialization_error is not None or now - started >= timeout_s):
             failure_reason = initialization_error['kind'] if initialization_error else 'timeout'
             close_at = now
-            close_windows = request_close(process.pid)
-            print('Requested normal close of owned client:', failure_reason,
-                  'windows:', close_windows, flush=True)
+            if request_close is not None:
+                close_windows = request_close(process.pid)
+                normal_close_requested = True
+                print('Requested normal close of owned client:', failure_reason,
+                      'windows:', close_windows, flush=True)
+            else:
+                print('Owned client retained without window control:', failure_reason, flush=True)
         if close_at is not None and now - close_at >= close_grace_s:
             return {'state': 'needs_attention', 'pid': process.pid, 'failure_reason': failure_reason,
-                    'normal_close_requested': True, 'close_windows': close_windows,
+                    'normal_close_requested': normal_close_requested, 'close_windows': close_windows,
                     'initialization_error': initialization_error, 'elapsed_s': round(now - started, 1)}
         if now >= notice:
             print('Test client running:', round(now - started), 's', flush=True)
@@ -251,7 +259,7 @@ def wait_for_client(process, folder, timeout_s, request_close, close_grace_s=30,
         sleep(1)
     initialization_error = initialization_error or fatal_client_log(folder, allow_busy=False, include_debug=True)
     return {'state': 'exited', 'pid': process.pid, 'exit_code': process.returncode,
-            'elapsed_s': round(clock() - started, 1), 'normal_close_requested': close_at is not None,
+            'elapsed_s': round(clock() - started, 1), 'normal_close_requested': normal_close_requested,
             'close_windows': close_windows, 'initialization_error': initialization_error,
             'failure_reason': failure_reason or (initialization_error or {}).get('kind')}
 
@@ -285,6 +293,8 @@ def main():
     parser.add_argument('--plan', type=Path)
     parser.add_argument('--output-root', type=Path)
     parser.add_argument('--mcp-helper', type=Path)
+    parser.add_argument('--allow-owned-window-close', action='store_true',
+                        help='Allow window-based cleanup only with explicit current-session desktop permission')
     options = parser.parse_args()
     require(options.timeout > 0, 'Timeout must be positive')
     if options.edt_project:
@@ -317,6 +327,7 @@ def main():
         receipt.prepare_test(cfg)
         args = client_arguments(config, cfg, receipt.folder / 'platform.log')
         receipt.record('client-preflight', {'application_mode': 'managed',
+                       'clear_cache': config.get('clear_cache', False),
                        'named_test_user': bool(config.get('username')),
                        'user_provisioning': config.get('user_provisioning', 'anonymous'),
                        'startup_command': 'RunUnitTests', 'close_after_tests': True})
@@ -342,8 +353,10 @@ def main():
                                        creationflags=subprocess.CREATE_NO_WINDOW, startupinfo=startup)
             receipt.record('client-started', {'pid': process.pid})
             print('Run', receipt.spec['run_id'], 'PID', process.pid, 'tests', len(selection), flush=True)
-            lifecycle = wait_for_client(process, receipt.folder, options.timeout,
-                                        lambda pid: request_owned_close(legacy, pid))
+            request_close = None
+            if options.allow_owned_window_close:
+                request_close = lambda pid: request_owned_close(legacy, pid)
+            lifecycle = wait_for_client(process, receipt.folder, options.timeout, request_close)
             close_requested = lifecycle['normal_close_requested']
             initialization_error = lifecycle['initialization_error']
             if initialization_error:
@@ -374,6 +387,7 @@ def main():
         receipt.record('owned-client-cleanup', wait_for_owned_client_cleanup(config, process, close_requested))
         capture_runtime(receipt, config, 'after')
         require(initialization_error is None, 'YAxUnit fatal startup error; run rejected')
+        require(lifecycle.get('failure_reason') is None, 'YAxUnit deadline failed; run rejected')
         require(expert_checks_passed, 'Expert HTTP fixture checks failed')
         require_clean_events(database_events)
         require_clean_dsml_events(dsml_events)

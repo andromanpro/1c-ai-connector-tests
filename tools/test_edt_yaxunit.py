@@ -1,5 +1,6 @@
 """Live EDT launch invariants; broken commands fail before a 1C process starts."""
 from pathlib import Path
+import json
 import tempfile, unittest
 from unittest.mock import Mock, patch
 import edt_yaxunit as edt
@@ -9,6 +10,17 @@ from yaxunit_startup_guard import execution_started
 
 
 class LaunchTests(unittest.TestCase):
+    def test_cli_cache_reset_is_refused_before_native_delivery(self):
+        for value in (True, 1, None, 'true'):
+            with self.subTest(value=value):
+                options = Mock()
+                options.plan.read_text.return_value = '{}'
+                options.base_config.read_text.return_value = json.dumps({'clear_cache': value})
+                with patch.object(edt.Receipt, 'begin') as begin:
+                    with self.assertRaisesRegex(VerificationError, 'managed CLI runner'):
+                        edt.run_live_edt(options)
+                    begin.assert_not_called()
+
     def test_request_has_no_client_commands_or_file_arguments(self):
         plan={"tests":["Тесты.Проверка"],"test_contexts":{"Тесты.Проверка":"Сервер"}}
         args=edt.runner_arguments("Проект",plan,600)

@@ -8,6 +8,29 @@ import verified_yaxunit as runner
 
 
 class LifecycleTests(unittest.TestCase):
+    def test_timeout_without_desktop_permission_retains_the_owned_process(self):
+        process = Mock(poll=Mock(return_value=None), pid=321)
+        ticks = iter([0, 11, 12, 13])
+        with tempfile.TemporaryDirectory() as directory:
+            result = runner.wait_for_client(process, Path(directory), 10, None, close_grace_s=2,
+                                            clock=lambda: next(ticks), sleep=lambda _: None)
+        self.assertEqual(result['state'], 'needs_attention')
+        self.assertEqual(result['failure_reason'], 'timeout')
+        self.assertFalse(result['normal_close_requested'])
+        self.assertEqual(result['close_windows'], 0)
+        process.terminate.assert_not_called()
+        process.kill.assert_not_called()
+
+    def test_late_exit_without_window_control_preserves_the_deadline_failure(self):
+        process = Mock(poll=Mock(side_effect=[None, 0]), returncode=0, pid=321)
+        ticks = iter([0, 11, 12])
+        with tempfile.TemporaryDirectory() as directory:
+            result = runner.wait_for_client(process, Path(directory), 10, None,
+                                            clock=lambda: next(ticks), sleep=lambda _: None)
+        self.assertEqual(result['state'], 'exited')
+        self.assertEqual(result['failure_reason'], 'timeout')
+        self.assertFalse(result['normal_close_requested'])
+
     def test_normal_exit_does_not_request_close(self):
         process = Mock(poll=Mock(return_value=0), returncode=0, pid=321)
         close = Mock()

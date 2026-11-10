@@ -9,6 +9,23 @@ class ClientPreflightTests(unittest.TestCase):
         self.assertIn('/RunModeManagedApplication',args);self.assertNotIn('/RunModeOrdinaryApplication',args)
     def test_server_unit_tests_do_not_request_test_manager(self):
         self.assertNotIn('/TESTMANAGER',client_arguments(self.config,'config.json','platform.log'))
+    def test_cache_reset_is_opt_in(self):
+        arguments = client_arguments(self.config, 'config.json', 'platform.log')
+        self.assertNotIn('/ClearCache', arguments)
+    def test_cache_reset_can_be_disabled_explicitly(self):
+        configuration = {**self.config, 'clear_cache': False}
+        arguments = client_arguments(configuration, 'config.json', 'platform.log')
+        self.assertNotIn('/ClearCache', arguments)
+    def test_cache_reset_is_requested_exactly_once(self):
+        configuration = {**self.config, 'clear_cache': True}
+        arguments = client_arguments(configuration, 'config.json', 'platform.log')
+        self.assertEqual(arguments.count('/ClearCache'), 1)
+    def test_cache_reset_requires_a_boolean(self):
+        for value in ('true', 1, None, [], {}):
+            with self.subTest(value=value):
+                configuration = {**self.config, 'clear_cache': value}
+                with self.assertRaises(VerificationError):
+                    client_arguments(configuration, 'config.json', 'platform.log')
     def test_ordinary_refused_before_launch(self):
         with self.assertRaises(VerificationError):client_arguments({**self.config,'run_mode':'ordinary'},'a','b')
     def test_direct_provisioning_refused(self):

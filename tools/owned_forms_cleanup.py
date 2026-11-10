@@ -33,6 +33,23 @@ def saved_launch(run):
     return launched
 
 
+def saved_actor(run):
+    """Read the disposable actor identity saved by the form probe."""
+    outcome = run / 'result.json'
+    if outcome.exists():
+        original = json.loads(outcome.read_text(encoding='utf-8'))
+        return original['actor']
+    origins = list(run.glob('K09_bsp_*.json'))
+    require(len(origins) == 1, 'Interrupted probe needs exactly one saved actor manifest')
+    origin = json.loads(origins[0].read_text(encoding='utf-8'))
+    actor = origin.get('actors', {}).get('forms')
+    require(isinstance(actor, dict) and bool(actor.get('ib_uid')), 'No completed actor identity was saved')
+    prefix = origin.get('prefix', '')
+    require(prefix.startswith('K09_bsp_') and origins[0].stem == prefix
+            and actor.get('name') == prefix + '_forms', 'Interrupted actor provenance differs')
+    return actor
+
+
 def candidate(rows, actor, launched, baseline, infobase, hostname, pid_alive):
     require(type(launched.get('pid')) is int and not pid_alive, 'Owned UI client is still running or unknown')
     require(actor['ib_uid'] not in {u['uid'] for u in baseline['ib_users'].values()}, 'Actor existed before this UI run')
@@ -160,8 +177,7 @@ def main():
         return
     if not options.run:
         parser.error('--run is required for disposable-actor recovery')
-    original = json.loads((options.run / 'result.json').read_text(encoding='utf-8'))
-    actor = original['actor']
+    actor = saved_actor(options.run)
     baseline = json.loads((options.run / 'baseline.json').read_text(encoding='utf-8'))
     before = json.loads((options.run / 'baseline-dialogues.json').read_text(encoding='utf-8'))
     launched = saved_launch(options.run)
@@ -170,8 +186,10 @@ def main():
     require(actor_evidence['actors']['forms'] == actor, 'Saved actor provenance differs')
     private_path = Path('F:/private/iikona-audit-20261013/k09-probes') / (prefix + '.json')
     private = json.loads(private_path.read_text(encoding='utf-8'))
-    require(private['prefix'] == prefix and actor_evidence['target'] == actors.out['target'], 'Recovery target differs')
-    folder = options.run / 'recovery'
+    require(private['prefix'] == prefix
+            and private['target'] == actor_evidence['target'] == actors.out['target'], 'Recovery target differs')
+    folder = options.output or options.run / 'recovery'
+    require(folder.resolve() != options.run.resolve(), 'Recovery output must preserve the original run')
     folder.mkdir(exist_ok=False)
     evidence = Evidence(folder)
     actors.O, actors.PRIVATE, actors.private, actors.out = folder, private_path, private, actor_evidence
@@ -182,6 +200,8 @@ def main():
     suite.created = [(entry['catalog'], uid) for uid, entry in private['objects'].items()]
     lease = actors.lease()
     try:
+        from ras_runtime import ensure_ras
+        ensure_ras(actors.C)
         cleanup(actors.C, actor, launched, baseline, evidence)
         suite.connect()
         remove_actor_dialogues(suite, [actor], before)

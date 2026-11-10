@@ -6,6 +6,7 @@ No configuration update, cache clearing, new user creation or forceful terminati
 """
 import argparse,atexit,collections,datetime,hashlib,json,msvcrt,os,subprocess,sys,time,uuid
 import xml.etree.ElementTree as ET
+import re
 from pathlib import Path
 import win32gui,win32process
 
@@ -16,7 +17,7 @@ EXPECTED_MODULES={'Тесты_КИИ_ПакетноеЧтение':10,'Тест�
 EXPECTED=93
 
 class Lease:
-    def __init__(self,base,*,directory=None):
+    def __init__(self,base,*,directory=None,recovery_run_folder=None):
         key=hashlib.sha256(str(Path(base).resolve()).casefold().encode('utf-8')).hexdigest()[:24]
         folder=Path(directory) if directory is not None else Path('F:/temp/iiexam-operation-leases');folder.mkdir(exist_ok=True)
         self.block_path=folder/(key+'.needs-attention.json')
@@ -27,10 +28,76 @@ class Lease:
         except OSError:
             self.file.close();self.file=None
             raise RuntimeError('База занята нашим другим прогоном. Подключение не выполнялось.') from None
+        self.recovery_marker = None
         if self.block_path.exists():
-            self.release()
-            raise RuntimeError('Previous client requires verified recovery; base remains blocked: '+str(self.block_path))
+            try:
+                if recovery_run_folder is None:
+                    raise RuntimeError('Previous client requires verified recovery; base remains blocked: '+str(self.block_path))
+                self.recovery_marker = self.verify_recovery(recovery_run_folder)
+            except Exception:
+                self.release()
+                raise
         atexit.register(self.release)
+
+    @staticmethod
+    def require_owned_client_exited(marker):
+        import psutil
+        try:
+            process = psutil.Process(marker['pid'])
+            if process.create_time() == marker['process_created_at']:
+                raise RuntimeError('Owned client is still running; recovery cannot proceed')
+        except psutil.NoSuchProcess:
+            pass
+
+    def verify_recovery(self, run_folder):
+        raw = self.block_path.read_bytes()
+        marker = json.loads(raw)
+        folder = Path(run_folder).resolve(strict=True)
+        if (marker.get('state') != 'needs_attention' or marker.get('recovery_required') is not True
+                or type(marker.get('pid')) is not int or marker['pid'] <= 0
+                or type(marker.get('process_created_at')) not in (int, float)
+                or marker['process_created_at'] <= 0
+                or Path(marker['run_folder']).resolve(strict=True) != folder):
+            raise RuntimeError('Recovery marker identity differs from the exact retained run')
+        inputs_raw = (folder / 'inputs.json').read_bytes()
+        if hashlib.sha256(inputs_raw).hexdigest() != (folder / 'inputs.sha256').read_text().strip():
+            raise RuntimeError('Recovery input receipt digest differs')
+        inputs = json.loads(inputs_raw)
+        retained = json.loads((folder / 'client-needs-attention.json').read_bytes())
+        if (inputs.get('run_id') != folder.name or inputs.get('target') != marker.get('target')
+                or not isinstance(inputs.get('source_hash'), str)
+                or not re.fullmatch(r'[0-9a-f]{64}', inputs['source_hash'])
+                or retained.get('run_id') != inputs['run_id']
+                or retained.get('source_hash') != inputs.get('source_hash')
+                or any(retained.get(key) != value for key, value in marker.items())):
+            raise RuntimeError('Recovery run and retained client receipts differ')
+        self.require_owned_client_exited(marker)
+        return {'raw': raw, 'marker': marker, 'source_hash': inputs['source_hash']}
+
+    def complete_recovery(self, evidence_path, restoration):
+        if self.file is None or self.recovery_marker is None:
+            raise RuntimeError('An active verified recovery lease is required')
+        proof = self.recovery_marker
+        if (restoration.get('target') != proof['marker']['target']
+                or restoration.get('source_hash') != proof['source_hash']
+                or any(restoration.get(key) is not True for key in
+                       ('cleanup_complete', 'policy_restored', 'scheduler_restored'))
+                or restoration.get('preservation') !=
+                   dict(users=True, constants=True, model_keys=True, tables=True)):
+            raise RuntimeError('Verified data and policy restoration are required before unblocking')
+        if self.block_path.read_bytes() != proof['raw']:
+            raise RuntimeError('Retained recovery marker changed')
+        self.require_owned_client_exited(proof['marker'])
+        evidence = dict(proof['marker'], recovered=True, source_hash=proof['source_hash'],
+                        restoration=restoration,
+                        recovered_at=datetime.datetime.now(datetime.timezone.utc).isoformat())
+        with Path(evidence_path).open('x', encoding='utf-8') as stream:
+            json.dump(evidence, stream, ensure_ascii=False, indent=2)
+            stream.flush()
+            os.fsync(stream.fileno())
+        self.block_path.unlink()
+        self.recovery_marker = None
+
     def retain(self,evidence):
         with self.block_path.open('x',encoding='utf-8') as stream:
             json.dump(evidence,stream,ensure_ascii=False,indent=2)

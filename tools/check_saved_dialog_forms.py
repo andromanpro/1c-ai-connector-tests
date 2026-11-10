@@ -13,7 +13,9 @@ os.environ['TC1C_RESPONSE_FORMAT'] = 'json'
 sys.path.insert(0, 'F:/WorkAI/tools/1c-testpilot/app')
 from testpilot import Client, ActionError
 import bsp_test_users as actors
-from check_saved_dialog_access import BASE_ROLES, Evidence, register_snapshot, remove_actor_dialogues
+from check_saved_dialog_access import (
+    BASE_ROLES, Evidence, register_snapshot, remove_actor_dialogues,
+)
 from edt_yaxunit import Mcp, edt_agent_provider
 from owned_forms_cleanup import cleanup as cleanup_owned_forms_session, failed_launch_result
 
@@ -39,6 +41,66 @@ def exercise_application_exit(client, evidence):
     assert stopped.get('ok') is True and stopped.get('shutdown') == 'graceful', \
         'Application did not close gracefully with an open dialogue: ' + str(stopped)
     return {'dialogue_open_on_exit': True, 'shutdown': stopped['shutdown']}
+
+
+def exercise_material_statuses(client, options, evidence, actor, baseline):
+    """Verify limited-role native reads of explicitly owned synthetic request states."""
+    from saved_dialog_form_fixtures import MaterialFixtures
+    safe_mode = client.execute_code(context='server', code='Результат = БезопасныйРежим();')
+    evidence.record('material-helper-safe-mode', safe_mode)
+
+    def open_case(fixture):
+        client.execute_code(context='client', parameters={
+            'dialogue': fixture['dialogue'], 'scale': options.form_scale or 100}, code='''
+Диалог = Параметры["dialogue"];
+ПараметрыОткрытия = Новый Структура("Диалог", Диалог);
+ОткрытьФорму("Обработка.КИИ_ТестИИ.Форма.Форма", ПараметрыОткрытия, , Диалог);
+Форма = ПолучитьФорму("Обработка.КИИ_ТестИИ.Форма.Форма", ПараметрыОткрытия, , Диалог);
+Форма.Масштаб = Параметры["scale"];
+Результат = Истина;
+''')
+        client.find_object(name='ПоказатьМатериалы').click()
+
+    def check(fixture, name, label, direction):
+        client.find_object(name='ОбновитьБеседу').click()
+        rows = client.find_object(name='ТаблицаВложений').read_rows(max_rows=10)
+        evidence.record('material-' + name, rows)
+        matches = [row for row in rows['rows'] if fixture['filename'] in row.values()]
+        assert len(matches) == 1, ('The original file row is missing or duplicated', rows)
+        assert matches[0].get('Направление') == direction, matches[0]
+        assert matches[0].get('Состояние') == label, matches[0]
+
+    with MaterialFixtures(actors.C, actor, baseline, evidence) as fixtures:
+        draft = fixtures.prepare('draft')
+        pending = fixtures.prepare('accepted')
+        failed = fixtures.prepare('error')
+        completed = fixtures.prepare('completed')
+        open_case(draft)
+        check(draft, 'draft', 'Отмечено для отправки', 'Исходящее')
+        open_case(pending)
+        check(pending, 'accepted', 'Запрос принят', 'Вопрос')
+        fixtures.change_pending_state(pending, 'Выполняется')
+        check(pending, 'processing', 'Запрос выполняется', 'Вопрос')
+        fixtures.change_pending_state(pending, 'Результат неизвестен')
+        check(pending, 'unknown', 'Результат неизвестен', 'Вопрос')
+        open_case(completed)
+        check(completed, 'completed', 'Запрос выполнен', 'Вопрос')
+        open_case(failed)
+        check(failed, 'error', 'Ошибка запроса', 'Вопрос')
+        table = client.find_object(name='ТаблицаВложений')
+        selected = table.goto_row(column='Файл', value=failed['filename'])
+        assert selected.get('found') is True, 'The reusable material is absent'
+        client.find_object(name='ПовторноИспользоватьМатериал').click()
+        client.find_object(name='ОбновитьБеседу').click()
+        repeated = client.find_object(name='ТаблицаВложений').read_rows(max_rows=10)
+        evidence.record('material-repeat-copy', repeated)
+        copies = [row for row in repeated['rows'] if failed['filename'] in row.values()]
+        assert len(copies) == 2, ('Explicit reuse must create a separate next-question file', repeated)
+        assert sorted(row['Состояние'] for row in copies) == sorted(['Ошибка запроса', 'Отмечено для отправки'])
+        options.output.joinpath('material-statuses.png').write_bytes(capture_screenshot(client).png)
+    return {'draft': True, 'accepted': True, 'processing': True, 'uncertain_with_same_counters': True,
+            'failed': True, 'completed': True, 'explicit_reuse_preserved_previous_status': True,
+            'provider_calls': 0}
 
 
 def exercise_dialogue_deletion(client, options, evidence):
@@ -187,6 +249,8 @@ def main():
     parser.add_argument('--helper', action='store_true')
     parser.add_argument('--size', type=int, nargs=2)
     parser.add_argument('--exercise', action='store_true')
+    parser.add_argument('--exercise-opening', action='store_true')
+    parser.add_argument('--exercise-material-statuses', action='store_true')
     parser.add_argument('--exercise-deletion', action='store_true')
     parser.add_argument('--exercise-multi-deletion', action='store_true')
     parser.add_argument('--exercise-application-exit', action='store_true')
@@ -196,6 +260,13 @@ def main():
         parser.error('--form-scale requires --helper and a value between 50 and 200')
     if options.exercise_deletion and not (options.helper and options.exercise):
         parser.error('--exercise-deletion requires --helper and --exercise')
+    if options.exercise_opening and not (options.helper and options.exercise):
+        parser.error('--exercise-opening requires --helper and --exercise')
+    if options.exercise_material_statuses and not options.helper:
+        parser.error('--exercise-material-statuses requires --helper')
+    if options.exercise_material_statuses and (options.exercise_deletion or options.exercise_multi_deletion
+                                             or options.exercise_application_exit):
+        parser.error('Material status verification requires its own undeleted dialogue')
     if options.exercise_multi_deletion and not (options.helper and options.exercise):
         parser.error('--exercise-multi-deletion requires --helper and --exercise')
     if options.exercise_deletion and options.exercise_multi_deletion:
@@ -294,13 +365,44 @@ def main():
                 client.find_object(name='МоиДиалоги').click()
                 evidence.record('saved-dialogue-list', client.get_context(result_mode='full', include_tables=True))
                 options.output.joinpath('saved-dialogue-list.png').write_bytes(capture_screenshot(client).png)
-                client.find_object(name='Выбрать').click()
+                if options.exercise_opening:
+                    table = client.find_object(name='СписокДиалогов')
+                    selected = table.goto_row(column='Беседа', value='UI-dialogue-B')
+                    assert selected.get('found') is True, 'The saved second dialogue is absent'
+                    evidence.record('opening-native-choice', table.choose_row())
+                    after_choice = client.get_context(result_mode='full', include_tables=True)
+                    evidence.record('opening-after-choice', after_choice)
+                    assert after_choice['form']['form_name'] == 'Обработка.КИИ_ТестИИ.Форма.Форма', \
+                        'Choosing a saved dialogue row must open its dialogue'
+                    result['native_row_choice_opened_dialogue'] = True
+                else:
+                    client.find_object(name='Выбрать').click()
                 evidence.record('reopened-second', client.get_context(result_mode='full'))
                 assert client.find_object(name='Промпт').get_data_presentation() == 'Draft B: independent second dialogue.'
                 result['two_independent_drafts'] = True
                 result['closed_dialogue_draft_restored'] = True
+                if options.exercise_opening:
+                    evidence.record('opening-context-mode', client.execute_code(context='client', code='''
+ПараметрыВыбора = Новый Структура("РежимВыбора", "Контекст");
+ОткрытьФорму("Обработка.КИИ_ТестИИ.Форма.Диалоги", ПараметрыВыбора);
+Результат = Истина;
+'''))
+                    table = client.find_object(name='СписокДиалогов')
+                    selected = table.goto_row(column='Беседа', value='UI-dialogue-A')
+                    assert selected.get('found') is True, 'Context source dialogue is absent'
+                    evidence.record('opening-context-choice', table.choose_row())
+                    context_selection = client.get_context(result_mode='full', include_tables=True)
+                    evidence.record('opening-context-after-choice', context_selection)
+                    assert context_selection['form']['form_name'] == 'Обработка.КИИ_ТестИИ.Форма.Диалоги', \
+                        'Context row choice must leave material selection open'
+                    client.close_window()
+                    assert client.find_object(name='Промпт').get_data_presentation() == \
+                        'Draft B: independent second dialogue.'
+                    result['context_choice_preserved_mode_and_draft'] = True
             if options.exercise_deletion:
                 result['deletion'] = exercise_dialogue_deletion(client, options, evidence)
+            if options.exercise_material_statuses:
+                result['material_statuses'] = exercise_material_statuses(client, options, evidence, actor, suite.baseline)
             if options.exercise_multi_deletion:
                 result['multi_deletion'] = exercise_multiple_dialogue_deletion(client, options, evidence)
             if options.exercise_application_exit:
