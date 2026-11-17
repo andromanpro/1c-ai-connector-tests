@@ -92,6 +92,27 @@ class ClosedReviewCleanup(unittest.TestCase):
 
 
 class FailedLaunchOwnership(unittest.TestCase):
+    def test_ras_failure_before_launch_needs_no_process_cleanup(self):
+        from owned_forms_cleanup import saved_launch
+        from pathlib import Path
+        import tempfile, json
+        with tempfile.TemporaryDirectory() as folder:
+            run = Path(folder)
+            (run/'result.json').write_text(json.dumps({'error_type': 'RasRuntimeError'}), encoding='utf-8')
+            self.assertIsNone(saved_launch(run))
+
+    def test_ras_failure_with_launch_artifacts_cannot_skip_ownership(self):
+        from owned_forms_cleanup import saved_launch
+        from pathlib import Path
+        import tempfile, json
+        for artifact in ['platform.log', 'action-error.json']:
+            with self.subTest(artifact=artifact), tempfile.TemporaryDirectory() as folder:
+                run = Path(folder)
+                (run/'result.json').write_text(json.dumps({'error_type': 'RasRuntimeError'}), encoding='utf-8')
+                (run/artifact).write_text('{}', encoding='utf-8')
+                with self.assertRaises(RuntimeError):
+                    saved_launch(run)
+
     def test_failed_launch_keeps_its_isolated_process(self):
         from owned_forms_cleanup import failed_launch_result
         value = {'ok': False, 'pid': 123, 'desktop': 'isolated', 'client_stopped': True}

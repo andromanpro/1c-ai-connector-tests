@@ -1,0 +1,104 @@
+{
+  "product_version": "1.9.4",
+  "run_id": "20261117T175615Z-f34c8b8b968c",
+  "source_hash": "f2bae8900b5f69eff834c978f562bed0e33031238bc1cbb2128ff2a31744c4cc",
+  "artifacts": {
+    "ИИКона": "6166b1d0ca0adc0bd6dbb4cab3204e707796fec049bc857ac41143a677a76a95",
+    "Тесты": "edcc18048a5e3ab7818aeac5826e1181c9cb3c20b3f8128eb322d4317dfb23c6"
+  },
+  "main": {
+    "passed": 1171,
+    "failed": 0,
+    "skipped": 0,
+    "contexts": {
+      "server": 1123,
+      "client": 48
+    }
+  },
+  "roles": [
+    {
+      "profile": "a",
+      "tests": 34,
+      "passed": true
+    },
+    {
+      "profile": "b",
+      "tests": 34,
+      "passed": true
+    },
+    {
+      "profile": "viewer",
+      "tests": 34,
+      "passed": true
+    }
+  ],
+  "harness_tests": 276,
+  "sonar": {
+    "gate": "OK",
+    "unresolved_issues": 0,
+    "analysis_id": "AaHqqSjDtrLX0xnSKvsN",
+    "profile_unchanged": true,
+    "scanner_warning": "Node.js 24; scanner recommends 16/18; analysis completed successfully"
+  },
+  "edt": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "preservation": {
+    "passed": true,
+    "tables": 29,
+    "all_fields": true,
+    "constants_users_and_model_keys_equal": true
+  },
+  "native_forms": [
+    {
+      "width": 3440,
+      "height": 1380,
+      "form_scale": 100
+    },
+    {
+      "width": 1600,
+      "height": 1000,
+      "form_scale": 80
+    },
+    {
+      "width": 1280,
+      "height": 768,
+      "form_scale": 60
+    }
+  ],
+  "source_counts": {
+    "product": 335,
+    "tests": 73,
+    "product_bsl": 94
+  },
+  "clean_bsp": {
+    "passed": true,
+    "version": "3.1.11.466",
+    "compiler": {
+      "exit_code": 0,
+      "diagnostic_count": 0,
+      "flags": [
+        "-ThinClient",
+        "-WebClient",
+        "-Server",
+        "-ExternalConnection",
+        "-ExternalConnectionServer",
+        "-ThickClientManagedApplication",
+        "-ThickClientServerManagedApplication",
+        "-ConfigLogIntegrity",
+        "-IncorrectReferences",
+        "-HandlersExistence"
+      ]
+    }
+  },
+  "review": {
+    "auditor": "Astra",
+    "scope": "Conversation navigation and isolation",
+    "findings_closed": true,
+    "followup": "Root reviewed later readability and native layout changes"
+  },
+  "scope": "Windows thin client 8.3.27.1989, authorized local SQL stand and separate vendor BSP",
+  "provider_tests": "Managed local fixtures",
+  "stand_scheduled_jobs_deny": "on"
+}

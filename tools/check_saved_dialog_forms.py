@@ -43,6 +43,36 @@ def exercise_application_exit(client, evidence):
     return {'dialogue_open_on_exit': True, 'shutdown': stopped['shutdown']}
 
 
+def exercise_review_controls(client, options, evidence):
+    """Choose and clear a real base value and inspect the moved command."""
+    base_field = client.find_object(name='ФильтрБазаБесед')
+    base_field.open_drop_list()
+    choices = base_field.get_choice_list()
+    evidence.record('review-base-choices', choices)
+    assert choices.get('ok') and choices.get('presentations'), 'No base choices were presented'
+    options.output.joinpath('base-drop-list.png').write_bytes(capture_screenshot(client).png)
+    chosen = choices['presentations'][0]
+    base_field.choose_from_drop_list(value=chosen)
+    accepted = client.find_object(name='ФильтрБазаБесед').get_data_presentation()
+    evidence.record('review-base-selected', accepted)
+    assert accepted, 'The chosen base was not applied'
+    client.find_object(name='ФильтрБазаБесед').clear()
+    cleared = client.find_object(name='ФильтрБазаБесед').get_data_presentation()
+    evidence.record('review-base-cleared', cleared)
+    assert cleared == '', 'The base filter was not cleared'
+    parent = client.find_object(name='КомандыПанелиБесед').info
+    button = client.find_object(name='Очистить').info
+    assert button['key'].startswith(parent['key'] + '.'), 'The new-dialogue command is outside the sidebar'
+    options.output.joinpath('review-expanded.png').write_bytes(capture_screenshot(client).png)
+    client.find_object(name='МоиДиалоги').click()
+    options.output.joinpath('review-collapsed.png').write_bytes(capture_screenshot(client).png)
+    hidden = client.find_object(name='ПанельБесед').is_visible()
+    assert hidden.get('visible') is False
+    client.find_object(name='МоиДиалоги').click()
+    return {'base_choices': choices['presentations'], 'base_selected': True, 'base_cleared': True,
+            'new_dialogue_in_sidebar': True, 'sidebar_hidden_and_restored': True}
+
+
 def exercise_material_statuses(client, options, evidence, actor, baseline):
     """Verify limited-role native reads of explicitly owned synthetic request states."""
     from saved_dialog_form_fixtures import MaterialFixtures
@@ -103,28 +133,41 @@ def exercise_material_statuses(client, options, evidence, actor, baseline):
             'provider_calls': 0}
 
 
+def record_table_states(client, evidence, name):
+    """Read table availability and edit modes without selecting or changing rows."""
+    states = []
+    for table in client.find_objects(cls='Table'):
+        info = table.info
+        target = {key: info.get(key) for key in ('key', 'handle', 'name', 'title')}
+        reads = {}
+        for action in ('is_visible', 'is_enabled', 'current_mode_is_edit'):
+            reads[action] = client.call(action, key=info['key'], handle=info['handle'], check=False)
+        states.append({'table': target, 'reads': reads})
+    evidence.record(name, states)
+    evidence.record(name + '-context', client.get_context(result_mode='full', include_tables=False))
+
+
 def exercise_dialogue_deletion(client, options, evidence):
     """Exercise the native list command on the two dialogues owned by this actor."""
     def select(title):
-        table = client.find_object(name='СписокДиалогов')
+        table = client.find_object(name='СписокБесед')
         table.goto_first_row()
         selected = table.goto_row(column='Беседа', value=title)
         assert selected.get('found') is True, ('Dialogue not found', selected)
-        actual = table.get_cell_text(column='СписокДиалоговСписокДиалогов1')
+        actual = table.get_cell_text(column='СписокБеседСписокБесед1')
         assert actual.get('text') == title, ('Selected dialogue differs', actual)
 
     def own_count():
-        value = client.find_object(name='СписокДиалогов').read_rows(max_rows=10)
+        value = client.find_object(name='СписокБесед').read_rows(max_rows=10)
         rows = value['rows']
         assert isinstance(rows, list), ('Native list rows are unavailable', value)
         return len(rows)
 
-    client.find_object(name='МоиДиалоги').click()
     select('UI-dialogue-A')
     evidence.record('deletion-list', client.get_context(result_mode='full', include_tables=True))
     options.output.joinpath('deletion-list.png').write_bytes(capture_screenshot(client).png)
     assert own_count() == 2, 'Deletion probe requires exactly the actor-owned pair'
-    client.find_object(name='УдалитьДиалог').click()
+    client.find_object(name='УдалитьБеседы').click()
     options.output.joinpath('deletion-question.png').write_bytes(capture_screenshot(client).png)
     answer = client.answer_dialog(confirm=False, timeout=10)
     evidence.record('deletion-cancel', answer)
@@ -135,7 +178,7 @@ def exercise_dialogue_deletion(client, options, evidence):
     assert after_cancel['form'].get('modified') is False, 'Cancel left the read-only list marked as unsaved'
 
     select('UI-dialogue-A')
-    client.find_object(name='УдалитьДиалог').click()
+    client.find_object(name='УдалитьБеседы').click()
     answer = client.answer_dialog(confirm=True, timeout=10)
     evidence.record('deletion-confirm-first', answer)
     assert answer.get('answered') == 'Да' and 'UI-dialogue-A' in (answer.get('question') or '')
@@ -144,12 +187,13 @@ def exercise_dialogue_deletion(client, options, evidence):
     evidence.record('deletion-open-forms-first', [form.info for form in forms])
     assert not any('UI-dialogue-A' in form.info.get('title', '') for form in forms), 'Deleted open dialogue remains on screen'
 
-    # The list was opened by B. This checks closing the owner form from its list.
+    # The shared workspace stays available after deleting its selected conversation.
     select('UI-dialogue-B')
-    client.find_object(name='УдалитьДиалог').click()
+    client.find_object(name='УдалитьБеседы').click()
     answer = client.answer_dialog(confirm=True, timeout=10)
     evidence.record('deletion-confirm-owner', answer)
     assert answer.get('answered') == 'Да' and 'UI-dialogue-B' in (answer.get('question') or '')
+    record_table_states(client, evidence, 'deletion-owner-table-states')
     evidence.record('deletion-owner-returned', client.get_context(result_mode='full', include_tables=True))
     options.output.joinpath('deletion-owner-returned.png').write_bytes(capture_screenshot(client).png)
     client.wait_until('Deleted owner dialogue disappears', own_count, condition=lambda n: n == 0, timeout=15, interval=1)
@@ -159,13 +203,12 @@ def exercise_dialogue_deletion(client, options, evidence):
     evidence.record('deletion-final', client.get_context(result_mode='full', include_tables=True))
     options.output.joinpath('deletion-final.png').write_bytes(capture_screenshot(client).png)
     return {'cancel_preserved_data': True, 'native_confirmations': 3,
-            'both_owned_dialogues_deleted': True, 'open_owner_and_other_form_closed': True}
+            'both_owned_dialogues_deleted': True, 'workspace_survived_deletion': True}
 
 
 def exercise_multiple_dialogue_deletion(client, options, evidence):
     """Delete the selected pair through one native confirmation, including cancel."""
-    client.find_object(name='МоиДиалоги').click()
-    table = client.find_object(name='СписокДиалогов')
+    table = client.find_object(name='СписокБесед')
     before = table.read_rows(max_rows=10)
     assert len(before['rows']) == 2, 'The multi-delete fixture requires exactly its own pair'
     table.select_all_rows()
@@ -173,10 +216,10 @@ def exercise_multiple_dialogue_deletion(client, options, evidence):
     evidence.record('multi-selection', selection)
     assert len(selection['rows']) == 2, 'Two rows must actually be selected in the live table'
     options.output.joinpath('multi-selection.png').write_bytes(capture_screenshot(client).png)
-    table = client.find_object(name='СписокДиалогов')
+    table = client.find_object(name='СписокБесед')
     table.select_all_rows()
     assert len(table.get_selected_rows()['rows']) == 2, 'Confirm must still apply to the selected pair'
-    client.find_object(name='УдалитьДиалог').click()
+    client.find_object(name='УдалитьБеседы').click()
     options.output.joinpath('multi-question.png').write_bytes(capture_screenshot(client).png)
     cancelled = client.answer_dialog(confirm=False, timeout=10)
     evidence.record('multi-cancel', cancelled)
@@ -184,18 +227,18 @@ def exercise_multiple_dialogue_deletion(client, options, evidence):
     after_cancel = client.get_context(result_mode='full', include_tables=True)
     evidence.record('multi-after-cancel', after_cancel)
     assert after_cancel['form'].get('modified') is False, 'Cancel must not mark the list as unsaved'
-    assert len(client.find_object(name='СписокДиалогов').read_rows(max_rows=10)['rows']) == 2
-    table = client.find_object(name='СписокДиалогов')
+    assert len(client.find_object(name='СписокБесед').read_rows(max_rows=10)['rows']) == 2
+    table = client.find_object(name='СписокБесед')
     table.select_all_rows()
     selection_after_cancel = table.get_selected_rows()
     evidence.record('multi-reselection', selection_after_cancel)
     assert len(selection_after_cancel['rows']) == 2, 'The second command must start with two selected rows'
-    client.find_object(name='УдалитьДиалог').click()
+    client.find_object(name='УдалитьБеседы').click()
     confirmed = client.answer_dialog(confirm=True, timeout=10)
     evidence.record('multi-confirm', confirmed)
     assert confirmed.get('answered') == 'Да' and '(2)' in (confirmed.get('question') or '')
     client.wait_until('The whole selected pair disappears',
-        lambda: len(client.find_object(name='СписокДиалогов').read_rows(max_rows=10)['rows']),
+        lambda: len(client.find_object(name='СписокБесед').read_rows(max_rows=10)['rows']),
         condition=lambda count: count == 0, timeout=15, interval=1)
     forms = client.find_objects(cls='ManagedForm', scope='application')
     evidence.record('multi-open-forms-final', [form.info for form in forms])
@@ -203,7 +246,7 @@ def exercise_multiple_dialogue_deletion(client, options, evidence):
     evidence.record('multi-final', client.get_context(result_mode='full', include_tables=True))
     options.output.joinpath('multi-final.png').write_bytes(capture_screenshot(client).png)
     return {'selected': 2, 'cancel_preserved_both': True,
-            'one_confirmation_deleted_both': True, 'open_dialogues_closed': True,
+            'one_confirmation_deleted_both': True, 'workspace_survived_deletion': True,
             'native_selection_committed': True}
 
 
@@ -242,6 +285,113 @@ def resize_owned_client(client, pid, width, height):
         dpi_context(previous_context)
 
 
+def exercise_sidebar(client, options, evidence):
+    """Verify one native workspace, horizontal collapse and independent drafts."""
+    def state():
+        context = client.get_context(result_mode='full', include_tables=False)
+        assert context.get('form', {}).get('form_name') == 'Обработка.КИИ_ТестИИ.Форма.Форма'
+        return {'form_id': context['form']['name'],
+                'title': client.find_object(name='ЗаголовокДиалога').get_data_presentation(),
+                'sidebar_visible': client.find_object(name='ПанельБесед').is_visible().get('visible')}
+
+    def select(title, draft):
+        evidence.record('sidebar-before-select-' + title,
+            client.get_context(result_mode='full', include_tables=False))
+        table = client.find_object(name='СписокБесед')
+        table.activate()
+        table.goto_first_row()
+        selected = table.goto_row(column='Беседа', value=title)
+        assert selected.get('found') is True, ('Saved dialogue missing', title, selected)
+        client.wait_until('Selected draft is visible',
+            lambda: client.find_object(name='Промпт').get_data_presentation(),
+            condition=lambda text: text == draft, timeout=20, interval=0.2)
+
+    initial = state()
+    assert initial['sidebar_visible']
+    draft_a = 'Draft A: keep this text in the first dialogue.'
+    draft_b = 'Draft B: independent second dialogue.'
+    client.find_object(name='ЗаголовокДиалога').input_text(text='UI-dialogue-A')
+    client.find_object(name='Промпт').input_text(text=draft_a)
+    evidence.record('sidebar-before-new', client.get_context(result_mode='full', include_tables=True))
+    client.find_object(name='Очистить').click()
+    second = state()
+    evidence.record('sidebar-after-new', second)
+    assert second['form_id'] == initial['form_id'], 'New dialogue opened another workspace'
+    assert second['title'] != 'UI-dialogue-A', 'New dialogue retained the previous title'
+    assert client.find_object(name='Промпт').get_data_presentation() == ''
+    evidence.record('sidebar-before-second-title', client.get_context(result_mode='full', include_tables=False))
+    try:
+        client.find_object(name='ЗаголовокДиалога').input_text(text='UI-dialogue-B')
+    except ActionError:
+        evidence.record('sidebar-title-failure-state', state())
+        record_table_states(client, evidence, 'sidebar-title-failure-tables')
+        raise
+    client.find_object(name='Промпт').input_text(text=draft_b)
+    select('UI-dialogue-A', draft_a)
+    assert state()['title'] == 'UI-dialogue-A'
+    evidence.record('sidebar-expanded', client.get_context(result_mode='full', include_tables=False))
+    options.output.joinpath('sidebar-expanded.png').write_bytes(capture_screenshot(client).png)
+    client.find_object(name='МоиДиалоги').click()
+    collapsed = state()
+    assert not collapsed['sidebar_visible']
+    assert client.find_object(name='Промпт').get_data_presentation() == draft_a
+    evidence.record('sidebar-collapsed', client.get_context(result_mode='full', include_tables=False))
+    options.output.joinpath('sidebar-collapsed.png').write_bytes(capture_screenshot(client).png)
+    client.find_object(name='МоиДиалоги').click()
+    assert state()['sidebar_visible']
+    select('UI-dialogue-B', draft_b)
+    result = {'single_workspace': True, 'two_independent_drafts': True,
+              'horizontal_sidebar_collapse': True, 'selection_preserved_after_expand': True}
+    if options.exercise_review_controls:
+        result['review_controls'] = exercise_review_controls(client, options, evidence)
+    if not (options.exercise_deletion or options.exercise_multi_deletion):
+        client.close_window()
+        client.execute_command(command='e1cib/app/Обработка.КИИ_ТестИИ')
+        select('UI-dialogue-B', draft_b)
+        result['closed_dialogue_draft_restored'] = True
+    if options.exercise_opening:
+        client.execute_code(context='client', code='''
+ПараметрыВыбора = Новый Структура("РежимВыбора", "Контекст");
+ОткрытьФорму("Обработка.КИИ_ТестИИ.Форма.Диалоги", ПараметрыВыбора);
+Результат = Истина;
+''')
+        table = client.find_object(name='СписокДиалогов')
+        chosen = table.goto_row(column='Беседа', value='UI-dialogue-A')
+        assert chosen.get('found') is True
+        table.choose_row()
+        context = client.get_context(result_mode='full', include_tables=True)
+        evidence.record('opening-context-after-choice', context)
+        assert context['form']['form_name'] == 'Обработка.КИИ_ТестИИ.Форма.Диалоги'
+        client.close_window()
+        assert client.find_object(name='Промпт').get_data_presentation() == draft_b
+        result['context_choice_preserved_mode_and_draft'] = True
+    return result
+
+
+def diagnose_layout(client, options, evidence):
+    """Capture bounded, reversible layout probes in the owned isolated form."""
+    lines = ['Форма = ПолучитьФорму("Обработка.КИИ_ТестИИ.Форма.Форма");', 'Сведения = Новый Массив;']
+    for group in ['ГруппаОсновная', 'РабочаяОбластьБесед', 'ПанельБесед']:
+        for name in ['Объединенная', 'СквозноеВыравнивание', 'РастягиватьПоВертикали', 'Группировка']:
+            expression = 'Форма.Элементы.' + group + '.' + name
+            lines.extend(['Попытка',
+                f'Сведения.Добавить(Новый Структура("property,value", "{expression}", Строка({expression})));',
+                'Исключение',
+                f'Сведения.Добавить(Новый Структура("property,error", "{expression}", ОписаниеОшибки()));',
+                'КонецПопытки;'])
+    lines.append('Результат = Сведения;')
+    values = client.execute_code(context='client', code='\n'.join(lines))
+    evidence.record('layout-properties', values)
+    changed = client.execute_code(context='client', code='''
+Форма = ПолучитьФорму("Обработка.КИИ_ТестИИ.Форма.Форма");
+Форма.Элементы.ГруппаОсновная.Объединенная = Ложь;
+Результат = Форма.Элементы.ГруппаОсновная.Объединенная;
+''')
+    evidence.record('layout-root-united-off', changed)
+    options.output.joinpath('layout-root-united-off.png').write_bytes(capture_screenshot(client).png)
+    return {'root_united_probe': changed.get('result')}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -254,10 +404,14 @@ def main():
     parser.add_argument('--exercise-deletion', action='store_true')
     parser.add_argument('--exercise-multi-deletion', action='store_true')
     parser.add_argument('--exercise-application-exit', action='store_true')
+    parser.add_argument('--exercise-review-controls', action='store_true')
+    parser.add_argument('--diagnose-layout', action='store_true')
     parser.add_argument('--form-scale', type=int)
     options = parser.parse_args()
     if options.form_scale is not None and (not options.helper or not 50 <= options.form_scale <= 200):
         parser.error('--form-scale requires --helper and a value between 50 and 200')
+    if options.diagnose_layout and not options.helper:
+        parser.error('--diagnose-layout requires --helper')
     if options.exercise_deletion and not (options.helper and options.exercise):
         parser.error('--exercise-deletion requires --helper and --exercise')
     if options.exercise_opening and not (options.helper and options.exercise):
@@ -273,6 +427,8 @@ def main():
         parser.error('Single and multi deletion fixtures must run separately')
     if options.exercise_application_exit and not (options.helper and options.exercise):
         parser.error('--exercise-application-exit requires --helper and --exercise')
+    if options.exercise_review_controls and not (options.helper and options.exercise):
+        parser.error('--exercise-review-controls requires --helper and --exercise')
     if options.exercise_application_exit and (options.exercise_deletion or options.exercise_multi_deletion):
         parser.error('Application-exit verification requires an open dialogue, without deletion')
     options.output.mkdir(parents=True, exist_ok=False)
@@ -351,54 +507,9 @@ def main():
                 from PIL import Image
                 assert Image.open(io.BytesIO(screenshot.png)).size == tuple(options.size), 'Screenshot and requested physical window size differ'
             if options.exercise:
-                client.find_object(name='ЗаголовокДиалога').input_text(text='UI-dialogue-A')
-                client.find_object(name='Промпт').input_text(text='Draft A: keep this text in the first dialogue.')
-                client.find_object(name='Очистить').click()
-                evidence.record('second-dialogue', client.get_context(result_mode='full'))
-                assert client.find_object(name='Промпт').get_data_presentation() == ''
-                client.find_object(name='ЗаголовокДиалога').input_text(text='UI-dialogue-B')
-                client.find_object(name='Промпт').input_text(text='Draft B: independent second dialogue.')
-                options.output.joinpath('two-dialogues.png').write_bytes(capture_screenshot(client).png)
-                client.close_window()
-                evidence.record('returned-first', client.get_context(result_mode='full'))
-                assert client.find_object(name='Промпт').get_data_presentation() == 'Draft A: keep this text in the first dialogue.'
-                client.find_object(name='МоиДиалоги').click()
-                evidence.record('saved-dialogue-list', client.get_context(result_mode='full', include_tables=True))
-                options.output.joinpath('saved-dialogue-list.png').write_bytes(capture_screenshot(client).png)
-                if options.exercise_opening:
-                    table = client.find_object(name='СписокДиалогов')
-                    selected = table.goto_row(column='Беседа', value='UI-dialogue-B')
-                    assert selected.get('found') is True, 'The saved second dialogue is absent'
-                    evidence.record('opening-native-choice', table.choose_row())
-                    after_choice = client.get_context(result_mode='full', include_tables=True)
-                    evidence.record('opening-after-choice', after_choice)
-                    assert after_choice['form']['form_name'] == 'Обработка.КИИ_ТестИИ.Форма.Форма', \
-                        'Choosing a saved dialogue row must open its dialogue'
-                    result['native_row_choice_opened_dialogue'] = True
-                else:
-                    client.find_object(name='Выбрать').click()
-                evidence.record('reopened-second', client.get_context(result_mode='full'))
-                assert client.find_object(name='Промпт').get_data_presentation() == 'Draft B: independent second dialogue.'
-                result['two_independent_drafts'] = True
-                result['closed_dialogue_draft_restored'] = True
-                if options.exercise_opening:
-                    evidence.record('opening-context-mode', client.execute_code(context='client', code='''
-ПараметрыВыбора = Новый Структура("РежимВыбора", "Контекст");
-ОткрытьФорму("Обработка.КИИ_ТестИИ.Форма.Диалоги", ПараметрыВыбора);
-Результат = Истина;
-'''))
-                    table = client.find_object(name='СписокДиалогов')
-                    selected = table.goto_row(column='Беседа', value='UI-dialogue-A')
-                    assert selected.get('found') is True, 'Context source dialogue is absent'
-                    evidence.record('opening-context-choice', table.choose_row())
-                    context_selection = client.get_context(result_mode='full', include_tables=True)
-                    evidence.record('opening-context-after-choice', context_selection)
-                    assert context_selection['form']['form_name'] == 'Обработка.КИИ_ТестИИ.Форма.Диалоги', \
-                        'Context row choice must leave material selection open'
-                    client.close_window()
-                    assert client.find_object(name='Промпт').get_data_presentation() == \
-                        'Draft B: independent second dialogue.'
-                    result['context_choice_preserved_mode_and_draft'] = True
+                result.update(exercise_sidebar(client, options, evidence))
+            if options.diagnose_layout:
+                result['layout_probe'] = diagnose_layout(client, options, evidence)
             if options.exercise_deletion:
                 result['deletion'] = exercise_dialogue_deletion(client, options, evidence)
             if options.exercise_material_statuses:

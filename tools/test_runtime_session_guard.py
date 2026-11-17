@@ -23,6 +23,49 @@ class GuardTests(unittest.TestCase):
         row,proof=self.agent()
         result=check_sessions(self.text(row),[],self.target,[proof])
         self.assertEqual(result['evidenced_edt_agents'],[proof])
+    def test_evidenced_hibernating_edt_agent_is_admitted(self):
+        row,proof=self.agent()
+        row.update(connection=ZERO,process=ZERO,hibernate='yes')
+        result=check_sessions(self.text(row),[],self.target,[proof])
+        self.assertEqual(result['evidenced_edt_agents'],[proof])
+    def test_evidenced_detached_nonhibernating_edt_agent_is_admitted(self):
+        row,proof=self.agent()
+        row.update(connection=ZERO,process=ZERO,hibernate='no')
+        result=check_sessions(self.text(row),[],self.target,[proof])
+        self.assertEqual(result['evidenced_edt_agents'],[proof])
+    def test_detached_nonhibernating_agent_requires_complete_idle_evidence(self):
+        row,proof=self.agent()
+        row.update(connection=ZERO,process=ZERO,hibernate='no')
+        changes=[{'connection':'connected'},{'process':'worker'},{'hibernate':'unknown'}]
+        changes.extend({field:'1'} for field in ACTIVITY)
+        for change in changes:
+            with self.subTest(change=change),self.assertRaises(VerificationError):
+                check_sessions(self.text({**row,**change}),[],self.target,[proof])
+        del row['hibernate']
+        with self.assertRaises(VerificationError):
+            check_sessions(self.text(row),[],self.target,[proof])
+    def test_hibernating_edt_agent_requires_complete_idle_evidence(self):
+        row,proof=self.agent()
+        row.update(connection=ZERO,process=ZERO,hibernate='yes')
+        for change in [{'hibernate':'unknown'},{'connection':'connected'},{'process':'worker'},
+                       {'calls-last-5min':'1'},{'cpu-time-current':'1'}]:
+            with self.subTest(change=change),self.assertRaises(VerificationError):
+                check_sessions(self.text({**row,**change}),[],self.target,[proof])
+        del row['memory-current']
+        with self.assertRaises(VerificationError):
+            check_sessions(self.text(row),[],self.target,[proof])
+    def test_hibernating_designer_without_process_proof_is_refused(self):
+        row,_=self.agent()
+        row.update(connection=ZERO,process=ZERO,hibernate='yes')
+        with self.assertRaises(VerificationError):
+            check_sessions(self.text(row),[],self.target)
+    def test_edt_connection_identity_cannot_be_missing(self):
+        row,proof=self.agent()
+        for field in ['connection','process']:
+            changed=dict(row)
+            del changed[field]
+            with self.subTest(field=field),self.assertRaises(VerificationError):
+                check_sessions(self.text(changed),[],self.target,[proof])
     def test_unproved_active_designer_is_refused(self):
         row,_=self.agent()
         with self.assertRaises(VerificationError):check_sessions(self.text(row),[],self.target)

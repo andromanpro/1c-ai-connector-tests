@@ -35,15 +35,21 @@ def _listening(endpoint):
 
 
 def _probe(rac, address):
-    try:
-        result = subprocess.run([str(rac), "cluster", "list", address], capture_output=True,
-                                timeout=10, creationflags=subprocess.CREATE_NO_WINDOW)
-    except (OSError, subprocess.TimeoutExpired) as error:
-        raise RasRuntimeError("Cannot verify local RAS cluster inventory") from error
-    if result.returncode:
-        raise RasRuntimeError("Local RAS is reachable but cluster inventory failed")
-    text = result.stdout.decode("utf-8-sig", errors="replace")
-    return set(re.findall(r"(?im)^cluster\s*:\s*([0-9a-f-]{36})\s*$", text))
+    for attempt in range(3):
+        try:
+            result = subprocess.run([str(rac), "cluster", "list", address], capture_output=True,
+                                    timeout=10, creationflags=subprocess.CREATE_NO_WINDOW)
+        except subprocess.TimeoutExpired as error:
+            if attempt == 2:
+                raise RasRuntimeError("Cannot verify local RAS cluster inventory after 3 reads") from error
+            time.sleep(0.2 * (attempt + 1))
+            continue
+        except OSError as error:
+            raise RasRuntimeError("Cannot run local RAS inventory command") from error
+        if result.returncode:
+            raise RasRuntimeError("Local RAS is reachable but cluster inventory failed")
+        text = result.stdout.decode("utf-8-sig", errors="replace")
+        return set(re.findall(r"(?im)^cluster\s*:\s*([0-9a-f-]{36})\s*$", text))
 
 
 def _verified(rac, address, cluster):

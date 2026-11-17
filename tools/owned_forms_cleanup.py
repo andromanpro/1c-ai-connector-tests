@@ -24,6 +24,11 @@ def saved_launch(run):
     if launch_path.exists():
         return json.loads(launch_path.read_text(encoding='utf-8'))
     outcome = json.loads((run / 'result.json').read_text(encoding='utf-8'))
+    if (outcome.get('error_type') == 'RasRuntimeError'
+            and not (run / 'platform.log').exists() and not (run / 'action-error.json').exists()):
+        # This probe stopped before launching a client. The recovery still requires
+        # an idle target and the actor's independent private ownership manifest.
+        return None
     require(outcome.get('error_type') == 'ActionError'
             and outcome.get('error', '').startswith('launch_client:'),
             'No proven failed launch in the saved outcome')

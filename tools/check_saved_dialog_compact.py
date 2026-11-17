@@ -243,9 +243,17 @@ def main():
         except Exception as error:
             result['cleanup_error'] = str(error)
         finally:
-            suite.disconnect()
-            lease.release()
-            evidence.record('result', result)
+            try:
+                suite.disconnect()
+            except Exception as error:
+                message = str(error)
+                if actors.C['password']:
+                    message = message.replace(str(actors.C['password']), '[password]')
+                result['disconnect_error'] = message
+                result['cleanup_complete'] = False
+            finally:
+                lease.release()
+                evidence.record('result', result)
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result['passed'] and result['cleanup_complete'] else 1
 

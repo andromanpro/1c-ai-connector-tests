@@ -32,7 +32,7 @@ def check_sessions(text,allowlist,target,edt_agents=()):
         if row['session'] in proofs:
             proof=proofs[row['session']]
             require(row.get('app-id')=='Designer' and row.get('host')==proof.get('host')
-                    and row.get('connection')!=ZERO and row.get('process')!=ZERO,
+                    and row.get('connection') and row.get('process'),
                     'EDT agent session identity differs')
             require(proof.get('target')==target and proof.get('native_parent_verified') is True
                     and proof.get('agent_mode') is True and proof.get('matching_target_processes')==1
@@ -40,6 +40,12 @@ def check_sessions(text,allowlist,target,edt_agents=()):
                     'EDT agent process was not independently verified')
             require(row.get('duration-current')=='0' and row.get('current-service-name')=='',
                     'EDT agent is executing a database operation')
+            disconnected=row['connection']==ZERO or row['process']==ZERO
+            if disconnected:
+                require(row['connection']==ZERO and row['process']==ZERO
+                        and row.get('hibernate') in ('yes','no')
+                        and all(row.get(key)=='0' for key in ACTIVITY),
+                        'EDT agent is only partly disconnected or has activity')
             agents.append(proof);continue
         identity=row['session'];require(identity in allowed,'Target has an unknown session')
         item=allowed[identity]

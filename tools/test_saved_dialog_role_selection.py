@@ -8,6 +8,14 @@ def plan(*names):
 
 
 class RoleSelectionTests(unittest.TestCase):
+    def test_direct_request_register_checks_require_administrator(self):
+        admin = ['ИдентификаторЗаданияСохраняетсяВПолеЗапроса',
+                 'ПозднееПодтверждениеСохраняетЗаданиеЗавершенногоЗапроса',
+                 'СостояниеЗапросаСвязаноСМатериалом']
+        selected = select_role_cases(plan('УдалениеСохраняетДругуюБеседу', *admin))
+        self.assertEqual(len(selected), 5)
+        self.assertFalse({MODULE + '.' + name for name in admin}.intersection(selected))
+
     def test_admin_storage_assertions_are_not_executed_by_limited_role(self):
         admin = ['УдалениеУбираетВсеДанныеБеседы', 'ГрупповоеУдалениеСохраняетНевыбраннуюБеседу',
                  'ГрупповоеУдалениеНеОбходитЧужогоВладельца', 'ЧужаяБеседаЗащищенаОтУдаления']

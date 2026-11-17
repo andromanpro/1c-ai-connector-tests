@@ -1,0 +1,9 @@
+{
+  "run_id": "20261117T175615Z-f34c8b8b968c",
+  "source_hash": "f2bae8900b5f69eff834c978f562bed0e33031238bc1cbb2128ff2a31744c4cc",
+  "verification_kind": "native-edt-delivery",
+  "artifacts": {
+    "ИИКона": "6166b1d0ca0adc0bd6dbb4cab3204e707796fec049bc857ac41143a677a76a95",
+    "Тесты": "edcc18048a5e3ab7818aeac5826e1181c9cb3c20b3f8128eb322d4317dfb23c6"
+  }
+}

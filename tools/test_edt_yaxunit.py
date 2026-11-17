@@ -102,4 +102,62 @@ class LaunchTests(unittest.TestCase):
         process.kill.assert_not_called()
 
 
+class AgentProcessProofTests(unittest.TestCase):
+    def setUp(self):
+        import socket
+        self.config = {'connection': 'Srvr="localhost";Ref="iikona_perf_20261011";'}
+        self.rows = 'session : session-id\napp-id : Designer\nhost : ' + socket.gethostname() + '\n'
+        self.target = Mock(pid=123)
+        self.target.cmdline.return_value = ['1cv8.exe', 'DESIGNER', '/Slocalhost\\iikona_perf_20261011', '/AgentMode']
+        self.target.create_time.return_value = 1000
+        self.parent = Mock(pid=456)
+        self.parent.name.return_value = '1cedt.exe'
+        self.target.parent.return_value = self.parent
+        self.item = {'pid': 123, 'ppid': 456, 'process_type': 'designer_session'}
+
+    def proof(self, items):
+        mcp = Mock()
+        mcp.call.return_value = {'data': {'processes': items}}
+        return edt.edt_agent_provider(mcp, self.config)(self.rows)
+
+    def test_disappeared_foreign_process_does_not_break_target_proof(self):
+        import psutil
+        foreign = {'pid': 8744, 'ppid': 456, 'process_type': 'designer_session'}
+        with patch('psutil.Process', side_effect=[psutil.NoSuchProcess(8744), self.target]):
+            result = self.proof([foreign, self.item])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]['pid'], 123)
+        self.assertTrue(result[0]['native_parent_verified'])
+
+    def test_disappeared_target_is_refused_without_a_proof(self):
+        import psutil
+        with patch('psutil.Process', side_effect=psutil.NoSuchProcess(123)):
+            with self.assertRaisesRegex(VerificationError, 'No unambiguous EDT agent'):
+                self.proof([self.item])
+
+    def test_disappeared_parent_is_refused_without_a_proof(self):
+        import psutil
+        self.parent.name.side_effect = psutil.NoSuchProcess(456)
+        with patch('psutil.Process', return_value=self.target):
+            with self.assertRaisesRegex(VerificationError, 'No unambiguous EDT agent'):
+                self.proof([self.item])
+
+    def test_disappeared_target_during_command_read_is_refused(self):
+        import psutil
+        self.target.cmdline.side_effect = psutil.NoSuchProcess(123)
+        with patch('psutil.Process', return_value=self.target):
+            with self.assertRaisesRegex(VerificationError, 'No unambiguous EDT agent'):
+                self.proof([self.item])
+
+    def test_wrong_parent_and_ambiguous_target_are_still_refused(self):
+        self.parent.name.return_value = 'foreign.exe'
+        with patch('psutil.Process', return_value=self.target):
+            with self.assertRaisesRegex(VerificationError, 'not the current EDT agent'):
+                self.proof([self.item])
+        self.parent.name.return_value = '1cedt.exe'
+        with patch('psutil.Process', return_value=self.target):
+            with self.assertRaisesRegex(VerificationError, 'No unambiguous EDT agent'):
+                self.proof([self.item, self.item])
+
+
 if __name__=='__main__':unittest.main()

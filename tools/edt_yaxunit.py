@@ -136,21 +136,26 @@ def edt_agent_provider(mcp,config):
         candidates=[]
         for item in data.get('processes',[]):
             if item.get('process_type')!='designer_session':continue
-            process=psutil.Process(item['pid']);args=process.cmdline()
-            # Normalize the two actual platform forms: /Sserver\\base and /S server\\base.
-            normalized=[];index=0
-            while index<len(args):
-                arg=args[index]
-                if arg.casefold() in ('/s','/f') and index+1<len(args):
-                    normalized.append((arg+args[index+1]).casefold());index+=2
-                else:normalized.append(arg.casefold());index+=1
-            if target not in normalized:continue
-            parent=process.parent()
-            require('/agentmode' in normalized and parent is not None
-                    and parent.name().casefold()=='1cedt.exe' and parent.pid==item['ppid'],
-                    'Target Designer is not the current EDT agent')
-            candidates.append({'pid':process.pid,'created_at':process.create_time(),
-                               'parent_pid':parent.pid,'native_parent_verified':True,'agent_mode':True})
+            try:
+                process=psutil.Process(item['pid']);args=process.cmdline()
+                # Normalize the two actual platform forms: /Sserver\\base and /S server\\base.
+                normalized=[];index=0
+                while index<len(args):
+                    arg=args[index]
+                    if arg.casefold() in ('/s','/f') and index+1<len(args):
+                        normalized.append((arg+args[index+1]).casefold());index+=2
+                    else:normalized.append(arg.casefold());index+=1
+                if target not in normalized:continue
+                parent=process.parent()
+                require('/agentmode' in normalized and parent is not None
+                        and parent.name().casefold()=='1cedt.exe' and parent.pid==item['ppid'],
+                        'Target Designer is not the current EDT agent')
+                candidates.append({'pid':process.pid,'created_at':process.create_time(),
+                                   'parent_pid':parent.pid,'native_parent_verified':True,'agent_mode':True})
+            except psutil.NoSuchProcess:
+                # The native process may disappear after the MCP snapshot.
+                # It cannot prove ownership; the unique live target is still required below.
+                continue
         require(len(candidates)==1,'No unambiguous EDT agent process for the target')
         row=designers[0]
         require(row.get('host','').casefold()==socket.gethostname().casefold(),'Designer is on another host')

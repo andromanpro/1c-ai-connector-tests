@@ -2,6 +2,7 @@ from contextlib import nullcontext
 import json
 from pathlib import Path
 import tempfile
+import subprocess
 import unittest
 from unittest.mock import Mock, patch
 
@@ -9,6 +10,28 @@ import ras_runtime as runtime
 
 
 class LocalRasTests(unittest.TestCase):
+    def test_inventory_timeout_is_retried_as_read_only(self):
+        reply = subprocess.CompletedProcess([], 0,
+            stdout=b'cluster : 439b49db-1f52-4c6b-b7f9-3969db2381b2\n', stderr=b'')
+        with patch.object(runtime.subprocess, 'run', side_effect=[subprocess.TimeoutExpired('rac', 10), reply]) as run, \
+                patch.object(runtime.time, 'sleep'):
+            self.assertEqual(runtime._probe('rac.exe', 'localhost:1545'), {self.cluster})
+            self.assertEqual(run.call_count, 2)
+
+    def test_inventory_timeout_has_a_bounded_retry_limit(self):
+        with patch.object(runtime.subprocess, 'run', side_effect=subprocess.TimeoutExpired('rac', 10)) as run, \
+                patch.object(runtime.time, 'sleep'):
+            with self.assertRaises(runtime.RasRuntimeError):
+                runtime._probe('rac.exe', 'localhost:1545')
+            self.assertEqual(run.call_count, 3)
+
+    def test_inventory_command_failure_is_not_retried(self):
+        reply = subprocess.CompletedProcess([], 1, stdout=b'', stderr=b'refused')
+        with patch.object(runtime.subprocess, 'run', return_value=reply) as run:
+            with self.assertRaises(runtime.RasRuntimeError):
+                runtime._probe('rac.exe', 'localhost:1545')
+            run.assert_called_once()
+
     def setUp(self):
         self.folder = tempfile.TemporaryDirectory()
         self.root = Path(self.folder.name)
