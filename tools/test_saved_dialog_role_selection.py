@@ -8,6 +8,11 @@ def plan(*names):
 
 
 class RoleSelectionTests(unittest.TestCase):
+    def test_real_question_sending_is_executed_by_limited_roles(self):
+        name = 'ИсполнительОбращаетсяКМоделиБезПривилегии'
+        selected = select_role_cases(plan(name))
+        self.assertIn(MODULE + '.' + name, selected)
+
     def test_direct_request_register_checks_require_administrator(self):
         admin = ['ИдентификаторЗаданияСохраняетсяВПолеЗапроса',
                  'ПозднееПодтверждениеСохраняетЗаданиеЗавершенногоЗапроса',

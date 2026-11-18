@@ -23,6 +23,7 @@ LIMITED_CASES = frozenset('''БинарныйФайлИсторииНеПере�
 ГрупповоеУдалениеСохраняетНаборПриАктивномЗапросе
 ИзменениеМатериаловОтменяетСтарыйСнимок
 ИсторияЧитаетсяПорциями
+ИсполнительОбращаетсяКМоделиБезПривилегии
 КонтекстОграниченнойРоли
 НазваниеИзВопросаСохраняетИсходныйТекст
 НазванияБеседОднострочные
@@ -49,8 +50,7 @@ LIMITED_CASES = frozenset('''БинарныйФайлИсторииНеПере�
 ЧужаяОперацияСохраняетВнешнююТранзакцию
 ЧужиеОперацииОграниченнойРолиЗапрещены'''.splitlines())
 # These tests prepare foreign rows or inspect raw registers as an administrator.
-ADMIN_CASES = frozenset(['ИсполнительОбращаетсяКМоделиБезПривилегии',
-    'ЧужаяБеседаИМатериалЗапрещены', 'КонтекстДругойБеседыСодержитСнимок',
+ADMIN_CASES = frozenset(['ЧужаяБеседаИМатериалЗапрещены', 'КонтекстДругойБеседыСодержитСнимок',
     'УдалениеУбираетВсеДанныеБеседы', 'ГрупповоеУдалениеСохраняетНевыбраннуюБеседу',
     'ГрупповоеУдалениеНеОбходитЧужогоВладельца', 'ЧужаяБеседаЗащищенаОтУдаления',
     'ИдентификаторЗаданияСохраняетсяВПолеЗапроса',
@@ -58,6 +58,53 @@ ADMIN_CASES = frozenset(['ИсполнительОбращаетсяКМодел
     'СостояниеЗапросаСвязаноСМатериалом'])
 ROLE_PROBES = ['КонтекстОграниченнойРоли', 'ЧужиеОперацииОграниченнойРолиЗапрещены',
               'ПрямоеЧтениеХранилищаЗапрещено', 'ЧужаяОперацияСохраняетВнешнююТранзакцию']
+
+
+def create_executor_fixture(base, owned):
+    """Prepare a local model and expert before entering restricted sessions."""
+    references = {}
+    for catalog in ['КИИ_МоделиИИ', 'КИИ_ЭкспертыИИ']:
+        identifier = str(uuid.uuid4())
+        owned.append((catalog, identifier))
+        manager = getattr(base.Справочники, catalog)
+        reference = manager.ПолучитьСсылку(base.NewObject('УникальныйИдентификатор', identifier))
+        item = manager.СоздатьЭлемент()
+        item.УстановитьСсылкуНового(reference)
+        item.Наименование = actors.PREFIX + '_' + catalog
+        if catalog == 'КИИ_МоделиИИ':
+            item.НаименованиеПолное = 'expert-test-saved-dialog-executor'
+            item.НаименованиеПровайдера = 'OpenAI'
+            item.Адрес = '127.0.0.1:18770'
+            item.АдресЗапроса = '/plain/chat/completions'
+            item.ТипФорматаAPI = base.Перечисления.КИИ_ТипыФорматовAPI.OpenAI_Compatible
+            item.ТипАвторизации = base.Перечисления.КИИ_ТипыАвторизации.Bearer
+            item.ИспользоватьЗащищенноеСоединение = False
+            item.ИспользоватьПрокси = False
+            item.Таймаут = 10
+            item.РежимКонтроляПерсональныхДанных = base.Перечисления.КИИ_РежимыКонтроляПерсональныхДанных.Выключен
+        else:
+            item.Модель = references['КИИ_МоделиИИ']
+        item.Записать()
+        references[catalog] = reference
+        item = reference = manager = None
+    return owned[-1][1]
+
+
+def remove_executor_fixture(base, owned):
+    for catalog, identifier in reversed(owned):
+        manager = getattr(base.Справочники, catalog)
+        reference = manager.ПолучитьСсылку(base.NewObject('УникальныйИдентификатор', identifier))
+        query = base.NewObject('Запрос')
+        query.Текст = 'ВЫБРАТЬ П.Ссылка ИЗ Справочник.' + catalog + ' КАК П ГДЕ П.Ссылка = &Ссылка'
+        query.УстановитьПараметр('Ссылка', reference)
+        exists = not query.Выполнить().Пустой()
+        query = None
+        if exists:
+            item = reference.ПолучитьОбъект()
+            require(str(item.Наименование).startswith(actors.PREFIX + '_'), 'Executor cleanup escaped its owned object scope')
+            item.Удалить()
+            item = None
+        reference = manager = None
 
 
 def select_role_cases(plan):
@@ -92,6 +139,7 @@ def main():
     result = {'passed': False, 'cleanup_complete': False, 'runs': []}
     suite = actors.Actors()
     records = {}
+    executor_objects = []
     before = None
     lease = actors.lease()
     try:
@@ -113,6 +161,8 @@ def main():
             records[kind] = suite.create(kind, BASE_ROLES + ['СохранениеДанныхПользователя'] + extra)
         identities = {kind: str(uuid.uuid4()) for kind in records}
         base = suite.base
+        executor_expert = create_executor_fixture(base, executor_objects)
+        evidence.record('executor-fixture', {'owned_objects': executor_objects, 'endpoint': 'http://127.0.0.1:18770/plain/chat/completions'})
         for kind, actor in records.items():
             entry = base.РегистрыСведений.КИИ_ДиалогиЧата.СоздатьМенеджерЗаписи()
             entry.Диалог = identities[kind]
@@ -122,7 +172,8 @@ def main():
             entry.Записать()
             foreign = 'b' if kind == 'a' else 'a'
             fixture = {'СвойВладелец': actor['ib_uid'], 'СвойДиалог': identities[kind],
-                       'ЧужойДиалог': identities[foreign], 'Материал': str(uuid.uuid4()), 'Запрос': str(uuid.uuid4())}
+                       'ЧужойДиалог': identities[foreign], 'Материал': str(uuid.uuid4()), 'Запрос': str(uuid.uuid4()),
+                       'Эксперт': executor_expert}
             base.Тесты_КИИ_ПраваЖурнала.УстановитьФикстуру(actor['name'], structure(base, fixture))
         entry = base = None
         gc.collect()
@@ -162,6 +213,7 @@ def main():
             for actor in records.values():
                 suite.base.Тесты_КИИ_ПраваЖурнала.УдалитьФикстуру(actor['name'])
             remove_actor_dialogues(suite, list(records.values()), before)
+            remove_executor_fixture(suite.base, executor_objects)
             suite.cleanup_generated_service_user()
             suite.cleanup()
             result['cleanup_complete'] = True

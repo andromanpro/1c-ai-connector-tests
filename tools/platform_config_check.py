@@ -8,9 +8,10 @@ import json
 import re
 import subprocess
 import sys
+import time
 
 from verification_receipt import Receipt, require
-from verified_yaxunit import idle, launch_argument, designer_authentication, public_base
+from verified_yaxunit import idle, launch_argument, designer_authentication, public_base, retain_live_client
 
 FLAGS = ['-ThinClient', '-WebClient', '-Server', '-ExternalConnection', '-ExternalConnectionServer',
          '-ThickClientManagedApplication', '-ThickClientServerManagedApplication',
@@ -29,7 +30,18 @@ def record_check(receipt, name, values):
                                  if key not in ('run_id', 'source_hash')})
 
 
-def check_configuration(receipt, config_path, evidence_dir=None, extension='ИИКона'):
+def wait_for_compiler(process, timeout_s, clock=time.monotonic):
+    deadline = clock() + timeout_s
+    while (remaining := deadline - clock()) > 0:
+        try:
+            return process.wait(timeout=min(remaining, 30))
+        except subprocess.TimeoutExpired:
+            print('Native compiler check still running; target database remains reserved', flush=True)
+    return process.poll()
+
+
+def check_configuration(receipt, config_path, evidence_dir=None, extension='ИИКона', timeout_s=600):
+    require(timeout_s > 0, 'Compiler timeout must be positive')
     receipt.unchanged()
     require((receipt.folder/'build.json').exists(), 'No captured installed CFE')
     config = json.loads(Path(config_path).read_text(encoding='utf-8-sig'))
@@ -63,17 +75,15 @@ def check_configuration(receipt, config_path, evidence_dir=None, extension='ИИ
         record['pid'] = process.pid
         (folder/'started.json').write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding='utf-8')
         print('Native compiler check', extension, 'PID', process.pid, flush=True)
-        while True:
-            try:
-                code = process.wait(timeout=30)
-                break
-            except subprocess.TimeoutExpired:
-                print('Native compiler check still running; target database remains reserved', flush=True)
+        code = wait_for_compiler(process, timeout_s)
         text = log.read_text(encoding='utf-8-sig') if log.exists() else ''
         record.update(classify_check(code, log.exists(), text))
+        record['timed_out'] = code is None
+        record['timeout_s'] = timeout_s
         record['finished'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
         (folder/'result.json').write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding='utf-8')
         record_check(receipt, record_name, record)
+        require(not record['timed_out'], 'Native compiler timed out; inspect the saved result and retained base reservation')
         require(record['passed'], 'Native compiler rejected the installed extension; inspect the saved check.log')
         idle(config)
         if extension == 'Тесты':
@@ -104,9 +114,11 @@ def check_configuration(receipt, config_path, evidence_dir=None, extension='ИИ
         print('Native compiler passed; external dispatcher context guard proved', flush=True)
         return record
     finally:
-        if process is not None and process.poll() is None:
-            process.wait()
-        lease.release()
+        try:
+            if process is not None and process.poll() is None:
+                retain_live_client(lease, receipt, process, 'native-compiler-still-running')
+        finally:
+            lease.release()
 
 
 def main():
@@ -114,8 +126,9 @@ def main():
     parser.add_argument('--run-folder', required=True)
     parser.add_argument('--base-config', required=True)
     parser.add_argument('--extension', choices=('ИИКона', 'Тесты'), default='ИИКона')
+    parser.add_argument('--timeout', type=int, default=600)
     args = parser.parse_args()
-    check_configuration(Receipt(args.run_folder), args.base_config, extension=args.extension)
+    check_configuration(Receipt(args.run_folder), args.base_config, extension=args.extension, timeout_s=args.timeout)
 
 
 if __name__ == '__main__':
