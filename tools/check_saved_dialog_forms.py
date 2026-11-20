@@ -368,6 +368,50 @@ def exercise_sidebar(client, options, evidence):
     return result
 
 
+def exercise_draft_input(client, evidence):
+    """Keep uncommitted text through the timer and restore both closing paths."""
+    title = 'Проверка ввода вопроса'
+
+    def reopen_with(expected):
+        client.close_window()
+        client.execute_command(command='e1cib/app/Обработка.КИИ_ТестИИ')
+        table = client.find_object(name='СписокБесед')
+        table.activate()
+        table.goto_first_row()
+        assert table.goto_row(column='Беседа', value=title).get('found') is True, 'Saved dialogue is missing'
+        client.wait_until('Saved draft is restored',
+            lambda: client.find_object(name='Промпт').get_data_presentation(),
+            condition=lambda text: text == expected, timeout=15, interval=0.3)
+
+    client.find_object(name='ЗаголовокДиалога').input_text(text=title)
+    prompt = client.find_object(name='Промпт')
+    prompt.activate()
+    sample = 'Проверка набора вопроса с паузой'
+    prompt.input_text(text=sample, finish=False)
+    assert prompt.get_edit_text().get('text') == sample, 'The probe needs an uncommitted edit buffer'
+    started = time.monotonic()
+    readings = []
+    while time.monotonic() - started < 7.1:
+        readings.append({'seconds': round(time.monotonic() - started, 2), 'text': prompt.get_edit_text().get('text')})
+        time.sleep(0.4)
+    preserved = all(row['text'] == sample for row in readings)
+    evidence.record('draft-buffer', {'preserved': preserved, 'readings': readings})
+    assert preserved, 'The dialogue timer cleared text that had not been committed'
+
+    client.find_object(name='ОтветHTML').activate()
+    assert prompt.get_data_presentation() == sample, 'The draft did not survive leaving the field'
+    reopen_with(sample)
+
+    prompt = client.find_object(name='Промпт')
+    prompt.activate()
+    active_edit = 'Черновик перед закрытием без выхода из поля'
+    prompt.input_text(text=active_edit, finish=False)
+    assert prompt.get_edit_text().get('text') == active_edit
+    reopen_with(active_edit)
+    return {'preserved_during_timer': True, 'restored_after_leaving_field': True,
+            'restored_after_closing_active_field': True}
+
+
 def diagnose_layout(client, options, evidence):
     """Capture bounded, reversible layout probes in the owned isolated form."""
     lines = ['Форма = ПолучитьФорму("Обработка.КИИ_ТестИИ.Форма.Форма");', 'Сведения = Новый Массив;']
@@ -405,6 +449,7 @@ def main():
     parser.add_argument('--exercise-multi-deletion', action='store_true')
     parser.add_argument('--exercise-application-exit', action='store_true')
     parser.add_argument('--exercise-review-controls', action='store_true')
+    parser.add_argument('--exercise-draft-input', action='store_true')
     parser.add_argument('--diagnose-layout', action='store_true')
     parser.add_argument('--form-scale', type=int)
     options = parser.parse_args()
@@ -506,6 +551,8 @@ def main():
                 import io
                 from PIL import Image
                 assert Image.open(io.BytesIO(screenshot.png)).size == tuple(options.size), 'Screenshot and requested physical window size differ'
+            if options.exercise_draft_input:
+                result['draft_input'] = exercise_draft_input(client, evidence)
             if options.exercise:
                 result.update(exercise_sidebar(client, options, evidence))
             if options.diagnose_layout:

@@ -1,0 +1,51 @@
+{
+  "version": "1.9.6",
+  "run_id": "20261120T074317Z-ec02863b9583",
+  "source_hash": "9fd4e3be96ec6f097db16d52aec8a861abbf7a340ab4debbcdb125e908555b92",
+  "artifacts": {
+    "ИИКона": "4616d76800ad2bb642f71b632072b34e70f5a8898cdb8329ae8ced6730556e72",
+    "Тесты": "979176cd83a6e62f00edc79c0ab1d44f7110f5f7d59dcd2cd4ba01769e574f8a"
+  },
+  "tests": {
+    "total": 1176,
+    "failed": 0,
+    "skipped": 0,
+    "runner": "EDT/YAxUnit"
+  },
+  "roles": [
+    {
+      "profile": "a",
+      "passed": 35
+    },
+    {
+      "profile": "b",
+      "passed": 35
+    },
+    {
+      "profile": "viewer",
+      "passed": 35
+    }
+  ],
+  "draft_input_testpilot": {
+    "preserved_during_timer": true,
+    "restored_after_leaving_field": true,
+    "restored_after_closing_active_field": true
+  },
+  "test_harness": {
+    "passed": 279
+  },
+  "sonar": {
+    "gate": "OK",
+    "open_issues": 0,
+    "analysis_id": "AaH37DuKtrLX0xnSMCTU"
+  },
+  "product_bsl_verified": 94,
+  "native_compiler": {
+    "product": true,
+    "independent_vendor_bsp": "3.1.11.466"
+  },
+  "data_preservation": {
+    "tables": 29,
+    "verified": true
+  }
+}
